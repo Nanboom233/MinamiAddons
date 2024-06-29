@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "top.nanboom233.Mixins",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "MixinMinecraftClient"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "MixinKeyboard"
+  ]
+}
