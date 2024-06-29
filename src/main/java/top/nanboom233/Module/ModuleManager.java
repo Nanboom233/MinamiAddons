@@ -2,8 +2,7 @@ package top.nanboom233.Module;
 
 import top.nanboom233.Handlers.TickHandler;
 import top.nanboom233.MinamiAddons;
-import top.nanboom233.Module.Modules.ExampleInstantModule;
-import top.nanboom233.Module.Modules.ExampleToggleModule;
+import top.nanboom233.Module.Modules.GhostBlock;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -42,8 +41,7 @@ public class ModuleManager {
     };
 
     public ModuleManager() {
-        register(new ExampleToggleModule());
-        register(new ExampleInstantModule());
+        register(new GhostBlock());
 
         TickHandler.getInstance().register(moduleTriggerHandle);
     }
