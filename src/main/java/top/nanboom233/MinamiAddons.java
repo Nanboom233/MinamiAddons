@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Config.Config;
 import top.nanboom233.Module.ModuleManager;
 import top.nanboom233.Utils.Keybind.MultiKeybind;
 
@@ -17,7 +18,8 @@ public class MinamiAddons implements ClientModInitializer {
     public static final String MOD_VERSION = "0.1.0-dev";
     public static final String MOD_ID = "minamiaddons";
     private static final Logger logger = LogManager.getLogger(MOD_ID);
-    private final ModuleManager moduleManager = ModuleManager.getInstance();
+    public static final ModuleManager moduleManager = ModuleManager.getInstance();
+    public static final Config config = Config.getInstance();
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -34,4 +36,5 @@ public class MinamiAddons implements ClientModInitializer {
     public static Logger getLogger() {
         return logger;
     }
+
 }

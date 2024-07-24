@@ -1,4 +1,5 @@
 plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.0.0'
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
 }
@@ -26,7 +27,12 @@ dependencies {
     include(modApi(fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)))
 
     modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
-    modImplementation(include("gg.essential:vigilance-1.18.1-fabric:299"))
+
+    modImplementation(include("gg.essential:universalcraft-1.21-fabric:344"))
+    modImplementation(include("gg.essential:elementa-1.18.1-fabric:652"))
+    modImplementation(include("gg.essential:vigilance-1.18.1-fabric:299") {
+        exclude("group": "gg.essential", "module": "universalcraft-1.18.1-fabric")
+    })
 }
 
 group = project.group + "." + project.mod_id
@@ -74,6 +80,5 @@ publishing {
             from components.java
         }
     }
-    repositories {
-    }
+    repositories {}
 }
