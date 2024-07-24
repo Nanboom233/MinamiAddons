@@ -1,10 +1,10 @@
 package top.nanboom233.Module;
 
 import org.jetbrains.annotations.NotNull;
-import top.nanboom233.Utils.InfoUtils;
+import top.nanboom233.Utils.ChatUtils;
 import top.nanboom233.Utils.Keybind.MultiKeybind;
 
-import static top.nanboom233.Utils.InfoUtils.MessageCategory.INFO;
+import static top.nanboom233.Utils.ChatUtils.MessageCategory.INFO;
 
 public abstract class ModuleTemplate {
     public String moduleName;
@@ -19,6 +19,6 @@ public abstract class ModuleTemplate {
     }
 
     protected void trigger() {
-        InfoUtils.showInChat(moduleName + " §6Triggered§r!", INFO);
+        ChatUtils.showInChat(moduleName + " §6Triggered§r!", INFO);
     }
 }

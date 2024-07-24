@@ -13,8 +13,7 @@ public class ExampleToggleModule extends ToggleModuleTemplate {
     public static final String moduleName = "ExampleToggleModule";
     public static final String description = "It's a example of toggleable modules.";
 
-    private static final MultiKeybind keyBinding = new MultiKeybind(
-            new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(KeyCodes.KEY_NONE))));
+    private static final MultiKeybind keyBinding = new MultiKeybind(new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(KeyCodes.KEY_NONE))));
 
     public ExampleToggleModule() {
         super(moduleName, description, keyBinding);
@@ -30,5 +29,8 @@ public class ExampleToggleModule extends ToggleModuleTemplate {
         super.onDisable();
     }
 
-
+    @Override
+    protected void tick() {
+        super.tick();
+    }
 }

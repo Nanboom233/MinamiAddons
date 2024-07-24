@@ -1,13 +1,12 @@
-package top.nanboom233.Features;
+package top.nanboom233.Features.Player;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import top.nanboom233.MinamiAddons;
 import top.nanboom233.Mixins.MixinChatHudAccessor;
-import top.nanboom233.Utils.InfoUtils;
+import top.nanboom233.Utils.ChatUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,11 +18,11 @@ public class ChatCopy {
         if (text == null) {
             return;
         }
-        if (text.indicator() == InfoUtils.minamiIndicater) {
+        if (text.indicator() == ChatUtils.minamiIndicater) {
             return;
         }
         mc.keyboard.setClipboard(text.content().getString().replaceAll("[\\u00a7&][0-9a-zA-Z]", ""));
-        InfoUtils.showInChat("Copied to clipboard!", InfoUtils.MessageCategory.DEBUG);
+        ChatUtils.showInChat("Copied to clipboard!", ChatUtils.MessageCategory.DEBUG);
     }
 
     public static void styledCopy() {
@@ -31,46 +30,13 @@ public class ChatCopy {
         if (text == null) {
             return;
         }
-        if (text.indicator() == InfoUtils.minamiIndicater) {
+        if (text.indicator() == ChatUtils.minamiIndicater) {
             return;
         }
         Pattern pattern = Pattern.compile("((?<!\\\\))\u00a7(?![^0-9a-fklmnor]|$)");
-        Matcher matcher = pattern.matcher(getOldFashionedText(text));
+        Matcher matcher = pattern.matcher(ChatUtils.getOldFashionedText(text.content()));
         mc.keyboard.setClipboard(matcher.replaceAll("&"));
-        InfoUtils.showInChat("Copied to clipboard with styles!", InfoUtils.MessageCategory.DEBUG);
-    }
-
-    public static String getOldFashionedText(ChatHudLine line) {
-        StringBuilder oldFashionedText = new StringBuilder();
-        line.content().visit((style, text) -> {
-            if (style.getColor() != null) {
-                InfoUtils.Styles color = InfoUtils.Styles.getStyle(style.getColor().getName());
-                System.out.println(color);
-                if (color != null) {
-                    oldFashionedText.append(color.FORMATTING);
-                } else {
-                    oldFashionedText.append("§[#").append(style.getColor().getName()).append("]");
-                }
-            }
-            if (style.isObfuscated()) {
-                oldFashionedText.append(InfoUtils.Styles.OBFUSCATED.FORMATTING);
-            }
-            if (style.isItalic()) {
-                oldFashionedText.append(InfoUtils.Styles.ITALIC.FORMATTING);
-            }
-            if (style.isBold()) {
-                oldFashionedText.append(InfoUtils.Styles.BOLD.FORMATTING);
-            }
-            if (style.isStrikethrough()) {
-                oldFashionedText.append(InfoUtils.Styles.STRIKE_THROUGH.FORMATTING);
-            }
-            if (style.isUnderlined()) {
-                oldFashionedText.append(InfoUtils.Styles.UNDERLINED.FORMATTING);
-            }
-            oldFashionedText.append(text);
-            return Optional.empty();
-        }, line.content().getStyle());
-        return oldFashionedText.toString();
+        ChatUtils.showInChat("Copied to clipboard with styles!", ChatUtils.MessageCategory.DEBUG);
     }
 
     private static ChatHudLine getChatLine(double x, double y) {

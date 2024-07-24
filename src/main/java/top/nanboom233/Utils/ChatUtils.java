@@ -4,14 +4,15 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 
 /**
  * @author Nanboom233
  */
-public class InfoUtils {
+public class ChatUtils {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     public static final MessageIndicator minamiIndicater = new MessageIndicator(
             13684944, null,
@@ -51,22 +52,71 @@ public class InfoUtils {
         showInChat(message);
     }
 
+    public static String getOldFashionedText(Text styledText) {
+        StringBuilder oldFashionedText = new StringBuilder();
+        styledText.visit((style, text) -> {
+            if (style.getColor() != null) {
+                Styles color = Styles.getStyle(style.getColor().getName());
+                System.out.println(color);
+                if (color != null) {
+                    oldFashionedText.append(color.FORMATTING);
+                } else {
+                    oldFashionedText.append("§[#").append(style.getColor().getName()).append("]");
+                }
+            }
+            if (style.isObfuscated()) {
+                oldFashionedText.append(Styles.OBFUSCATED.FORMATTING);
+            }
+            if (style.isItalic()) {
+                oldFashionedText.append(Styles.ITALIC.FORMATTING);
+            }
+            if (style.isBold()) {
+                oldFashionedText.append(Styles.BOLD.FORMATTING);
+            }
+            if (style.isStrikethrough()) {
+                oldFashionedText.append(Styles.STRIKE_THROUGH.FORMATTING);
+            }
+            if (style.isUnderlined()) {
+                oldFashionedText.append(Styles.UNDERLINED.FORMATTING);
+            }
+            oldFashionedText.append(text);
+            return Optional.empty();
+        }, styledText.getStyle());
+        return oldFashionedText.toString();
+    }
+
+    public static String getCleanText(Text styledText) {
+        StringBuilder cleanText = new StringBuilder();
+        styledText.visit((style, text) -> {
+            cleanText.append(text);
+            return Optional.empty();
+        }, styledText.getStyle());
+        return cleanText.toString();
+    }
+
 
     public enum MessageCategory {
         FATAL, ERROR, WARNING, DEBUG, INFO
     }
 
     public static void printActionbarMessage(String key, Object... args) {
-        sendVanillaMessage(Text.translatable(key, args));
-    }
-
-    public static void sendVanillaMessage(MutableText message) {
-        World world = mc.world;
-
-        if (world != null) {
-            mc.inGameHud.setOverlayMessage(message, false);
+        MutableText text = Text.translatable(key, args);
+        if (mc.world != null) {
+            mc.inGameHud.setOverlayMessage(text, false);
         }
     }
+
+    public static void sendMessage(String message) {
+        if (mc.player == null) {
+            return;
+        }
+        if (message.startsWith("/")) {
+            mc.player.networkHandler.sendChatCommand(message.substring(1));
+        } else {
+            mc.player.networkHandler.sendChatMessage(message);
+        }
+    }
+
 
     public enum Styles {
         BLACK("§0", "black"),

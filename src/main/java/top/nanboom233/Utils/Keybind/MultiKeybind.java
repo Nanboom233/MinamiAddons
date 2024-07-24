@@ -2,7 +2,7 @@ package top.nanboom233.Utils.Keybind;
 
 import top.nanboom233.Handlers.TickHandler;
 import top.nanboom233.MinamiAddons;
-import top.nanboom233.Utils.InfoUtils;
+import top.nanboom233.Utils.ChatUtils;
 import top.nanboom233.Utils.KeyboardUtils;
 
 import java.util.HashSet;
@@ -135,7 +135,7 @@ public class MultiKeybind implements IKeybindCategory {
         String msg = String.format("%s %s (%d), held keys: %s", type, keyName, keyCode, held);
 
         if (MinamiAddons.config.printKeyboardDebugMessage) {
-            InfoUtils.printActionbarMessage(msg);
+            ChatUtils.printActionbarMessage(msg);
         }
     }
 

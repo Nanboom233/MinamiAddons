@@ -7,7 +7,6 @@ import top.nanboom233.Utils.Keybind.MultiKeybind;
 import java.util.HashSet;
 import java.util.Set;
 
-import static top.nanboom233.MinamiAddons.mc;
 import static top.nanboom233.Utils.Keybind.AdvancedKeybind.KeyTriggerType.INGAME;
 
 public class ExampleInstantModule extends ModuleTemplate {
@@ -24,9 +23,5 @@ public class ExampleInstantModule extends ModuleTemplate {
     @Override
     protected void trigger() {
         super.trigger();
-        if (mc.player == null) {
-            return;
-        }
-        mc.player.networkHandler.sendChatMessage("w");
     }
 }

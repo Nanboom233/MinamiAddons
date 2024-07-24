@@ -7,7 +7,7 @@ import gg.essential.vigilance.data.Property;
 import gg.essential.vigilance.data.PropertyType;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import top.nanboom233.Handlers.TickHandler;
-import top.nanboom233.Utils.InfoUtils;
+import top.nanboom233.Utils.ChatUtils;
 import top.nanboom233.Utils.Keybind.AdvancedKeybind;
 import top.nanboom233.Utils.Keybind.KeyCodes;
 import top.nanboom233.Utils.Keybind.MultiKeybind;
@@ -21,8 +21,9 @@ import java.util.Set;
 import static top.nanboom233.Utils.Keybind.AdvancedKeybind.KeyTriggerType.INGAME;
 
 public class Config extends Vigilant {
-    private static final String CONFIG_FILE_PATH = "./config/MimamiAddons.toml";
+    private static final String CONFIG_PATH = "./config/MinamiAddons/";
     private static final Config INSTANCE = new Config();
+    public final KeybindConfig KEYBIND_CONFIG = new KeybindConfig(INSTANCE);
     private static final MultiKeybind keyBinding = new MultiKeybind(
             new AdvancedKeybind(INGAME, false, new HashSet<>(Set.of(KeyCodes.KEY_L))));
 
@@ -30,7 +31,7 @@ public class Config extends Vigilant {
         return INSTANCE;
     }
 
-    public static List<MessageIndicator> timestampWhitelist = new ArrayList<>(List.of(InfoUtils.minamiIndicater));
+    public static List<MessageIndicator> timestampWhitelist = new ArrayList<>(List.of(ChatUtils.minamiIndicater));
 
     public final TickHandler.ITickTask configOpenHandle = mc -> {
         if (keyBinding.wasPressed()) {
@@ -41,9 +42,8 @@ public class Config extends Vigilant {
         }
     };
 
-
     public Config() {
-        super(new File(CONFIG_FILE_PATH), "MinamiAddons");
+        super(new File(CONFIG_PATH + "Features.toml"), "MinamiAddons");
         initialize();
         TickHandler.getInstance().register(configOpenHandle);
     }
@@ -77,5 +77,9 @@ public class Config extends Vigilant {
     )
     public boolean ghostBlock = false;
 
+    public class KeybindConfig {
+        public KeybindConfig(Config instance) {
+        }
+    }
 }
 

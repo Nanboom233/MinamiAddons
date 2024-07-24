@@ -1,6 +1,7 @@
 package top.nanboom233.Module;
 
-import top.nanboom233.Features.GhostBlock;
+import top.nanboom233.Features.OurCityUtils.FastCityChest;
+import top.nanboom233.Features.World.GhostBlock;
 import top.nanboom233.Handlers.TickHandler;
 import top.nanboom233.MinamiAddons;
 
@@ -33,6 +34,9 @@ public class ModuleManager {
             if (module.keyBinding.wasPressed()) {
                 module.trigger();
             }
+            if (module instanceof ToggleModuleTemplate && ((ToggleModuleTemplate) module).state) {
+                ((ToggleModuleTemplate) module).tick();
+            }
         }
         if (curTime - lastAlert < 5000L) {
             moduleList.removeIf(Objects::isNull);
@@ -41,9 +45,10 @@ public class ModuleManager {
     };
 
     public ModuleManager() {
-//        register(new ExampleToggleModule());
+        register(new ExampleToggleModule());
         register(new ExampleInstantModule());
         register(new GhostBlock());
+        register(new FastCityChest());
 
         TickHandler.getInstance().register(moduleTriggerHandle);
     }

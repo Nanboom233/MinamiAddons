@@ -1,4 +1,4 @@
-package top.nanboom233.Features;
+package top.nanboom233.Features.World;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.util.hit.BlockHitResult;
