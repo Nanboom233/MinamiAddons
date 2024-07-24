@@ -9,7 +9,6 @@ import static top.nanboom233.Utils.InfoUtils.MessageCategory.INFO;
 public abstract class ModuleTemplate {
     public String moduleName;
     public String description;
-    public boolean state = false;
     @NotNull
     public MultiKeybind keyBinding;
 
@@ -19,7 +18,7 @@ public abstract class ModuleTemplate {
         this.keyBinding = keyBinding;
     }
 
-    public void trigger() {
+    protected void trigger() {
         InfoUtils.showInChat(moduleName + " §6Triggered§r!", INFO);
     }
 }

@@ -11,13 +11,15 @@ import static top.nanboom233.Utils.InfoUtils.MessageCategory.INFO;
  */
 
 public abstract class ToggleModuleTemplate extends ModuleTemplate {
+    public boolean state = false;
+
 
     public ToggleModuleTemplate(String moduleName, String description, @NotNull MultiKeybind keyBinding) {
         super(moduleName, description, keyBinding);
     }
 
     @Override
-    public void trigger() {
+    protected void trigger() {
         toggle();
     }
 
@@ -38,11 +40,11 @@ public abstract class ToggleModuleTemplate extends ModuleTemplate {
         setState(!state);
     }
 
-    public void onEnable() {
+    protected void onEnable() {
         InfoUtils.showInChat(moduleName + " is now §2Enabled§r.", INFO);
     }
 
-    public void onDisable() {
+    protected void onDisable() {
         InfoUtils.showInChat(moduleName + " is now §4Disabled§r.", INFO);
     }
 

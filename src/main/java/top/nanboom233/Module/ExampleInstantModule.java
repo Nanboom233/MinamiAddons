@@ -22,7 +22,7 @@ public class ExampleInstantModule extends ModuleTemplate {
     }
 
     @Override
-    public void trigger() {
+    protected void trigger() {
         super.trigger();
         if (mc.player == null) {
             return;

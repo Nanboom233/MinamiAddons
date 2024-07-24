@@ -21,12 +21,14 @@ public class ExampleToggleModule extends ToggleModuleTemplate {
     }
 
     @Override
-    public void onEnable() {
+    protected void onEnable() {
         super.onEnable();
     }
 
     @Override
-    public void onDisable() {
+    protected void onDisable() {
         super.onDisable();
     }
+
+
 }
