@@ -10,7 +10,7 @@ public class KeyboardUtils {
         long window = MinecraftClient.getInstance().getWindow().getHandle();
 
         return (keyCode >= 0 && GLFW.glfwGetKey(window, keyCode) == GLFW.GLFW_PRESS) ||
-                (keyCode >= -100 && GLFW.glfwGetMouseButton(window, keyCode) == GLFW.GLFW_PRESS);
+                (keyCode <= -100 && GLFW.glfwGetMouseButton(window, keyCode) == GLFW.GLFW_PRESS);
     }
 
     @Nullable

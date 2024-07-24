@@ -11,12 +11,18 @@ import top.nanboom233.Utils.Keybind.MultiKeybind;
 
 @Mixin(MinecraftClient.class)
 public class MixinMinecraftClient {
-    @Inject(method = "run", at = @At("HEAD"))
+    @Inject(
+            method = "run",
+            at = @At("HEAD")
+    )
     private void init(CallbackInfo info) {
         // This code is injected into the start of MinecraftClient.run()V
     }
 
-    @Inject(method = "tick()V", at = @At("RETURN"))
+    @Inject(
+            method = "tick()V",
+            at = @At("RETURN")
+    )
     private void onTick(CallbackInfo ci) {
         MultiKeybind.reCheckPressedKeys();
         TickHandler.getInstance().onClientEndTick((MinecraftClient) (Object) this);

@@ -9,8 +9,14 @@ import top.nanboom233.Handlers.KeyboardInputHandler;
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
-    @Inject(method = "onKey", cancellable = true,
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/Keyboard;debugCrashStartTime:J", ordinal = 0))
+    @Inject(
+            method = "onKey",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/Keyboard;debugCrashStartTime:J",
+                    ordinal = 0
+            )
+    )
     private void onKeyboardInput(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
         KeyboardInputHandler.onKeyInput(key, scanCode, modifiers, action != 0);
     }

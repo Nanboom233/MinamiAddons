@@ -1,13 +1,13 @@
-package top.nanboom233.Module.Modules;
+package top.nanboom233.Features;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import top.nanboom233.Module.ModuleTemplate;
 import top.nanboom233.Utils.Keybind.AdvancedKeybind;
+import top.nanboom233.Utils.Keybind.KeyCodes;
 import top.nanboom233.Utils.Keybind.MultiKeybind;
 
 import java.util.HashSet;
@@ -24,7 +24,7 @@ public class GhostBlock extends ModuleTemplate {
     private static long lastSwing = -1;
 
     private static final MultiKeybind keyBinding = new MultiKeybind(
-            new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(InputUtil.GLFW_KEY_X))));
+            new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(KeyCodes.KEY_X))));
 
     public GhostBlock() {
         super(moduleName, description, keyBinding);
@@ -32,7 +32,7 @@ public class GhostBlock extends ModuleTemplate {
 
     @Override
     public void trigger() {
-        super.trigger();
+//        super.trigger();
         if (mc.world != null && mc.player != null) {
             HitResult hitResult = mc.crosshairTarget;
             if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {

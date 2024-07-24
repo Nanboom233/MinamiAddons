@@ -134,8 +134,9 @@ public class MultiKeybind implements IKeybindCategory {
         String held = getActiveKeysString();
         String msg = String.format("%s %s (%d), held keys: %s", type, keyName, keyCode, held);
 
-//        MinamiAddons.getLogger().info(msg);
-        InfoUtils.printActionbarMessage(msg);
+        if (MinamiAddons.config.printKeyboardDebugMessage) {
+            InfoUtils.printActionbarMessage(msg);
+        }
     }
 
     public static String getActiveKeysString() {

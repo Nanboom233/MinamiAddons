@@ -1,8 +1,7 @@
-package top.nanboom233.Module.Modules;
+package top.nanboom233.Module;
 
-import net.minecraft.client.util.InputUtil;
-import top.nanboom233.Module.ToggleModuleTemplate;
 import top.nanboom233.Utils.Keybind.AdvancedKeybind;
+import top.nanboom233.Utils.Keybind.KeyCodes;
 import top.nanboom233.Utils.Keybind.MultiKeybind;
 
 import java.util.HashSet;
@@ -15,7 +14,7 @@ public class ExampleToggleModule extends ToggleModuleTemplate {
     public static final String description = "It's a example of toggleable modules.";
 
     private static final MultiKeybind keyBinding = new MultiKeybind(
-            new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(InputUtil.UNKNOWN_KEY.getCode()))));
+            new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(KeyCodes.KEY_NONE))));
 
     public ExampleToggleModule() {
         super(moduleName, description, keyBinding);
