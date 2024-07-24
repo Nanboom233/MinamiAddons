@@ -22,9 +22,7 @@ public class MixinMouse {
 
     @Inject(
             method = "onMouseButton",
-            at = @At(
-                    value = "RETURN"
-            )
+            at = @At("RETURN")
     )
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo info) {
         if (!Config.getInstance().chatCopy) {

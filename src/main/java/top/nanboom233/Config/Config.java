@@ -69,4 +69,13 @@ public class Config extends Vigilant {
             category = "Chats"
     )
     public boolean chatCopy = false;
+
+    @Property(type = PropertyType.CHECKBOX,
+            name = "Ghost Block",
+            description = "Make ghost blocks with keybinds.",
+            category = "World"
+    )
+    public boolean ghostBlock = false;
+
 }
+

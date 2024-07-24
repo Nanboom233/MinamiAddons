@@ -5,6 +5,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import top.nanboom233.Config.Config;
 import top.nanboom233.Module.ModuleTemplate;
 import top.nanboom233.Utils.Keybind.AdvancedKeybind;
 import top.nanboom233.Utils.Keybind.KeyCodes;
@@ -32,7 +33,9 @@ public class GhostBlock extends ModuleTemplate {
 
     @Override
     public void trigger() {
-//        super.trigger();
+        if (!Config.getInstance().ghostBlock) {
+            return;
+        }
         if (mc.world != null && mc.player != null) {
             HitResult hitResult = mc.crosshairTarget;
             if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
@@ -40,8 +43,6 @@ public class GhostBlock extends ModuleTemplate {
             }
             Vec3d vec3d = hitResult.getPos();
             BlockPos lookingAtPos = ((BlockHitResult) hitResult).getBlockPos();
-//            InfoUtils.showInChat("vec3d:" + vec3d.toString(), InfoUtils.MessageCategory.DEBUG);
-//            InfoUtils.showInChat("blockpos:" + lookingAtPos.toString(), InfoUtils.MessageCategory.DEBUG);
             long curTime = System.currentTimeMillis();
             if (lastSwing + 250 < curTime) {
                 mc.player.swingHand(MAIN_HAND);
