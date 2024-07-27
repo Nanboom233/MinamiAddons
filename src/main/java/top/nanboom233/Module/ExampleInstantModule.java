@@ -27,10 +27,10 @@ public class ExampleInstantModule extends ModuleTemplate {
     protected void trigger() {
         super.trigger();
         if (mc.interactionManager != null && mc.player != null) {
-            BlockPos blockPos = new BlockPos(-60, 72, 424);
-            Vec3d hitVecIn = new Vec3d(-60, 72, 424);
+            BlockPos blockPos = new BlockPos(81, 76, 172);
+            Vec3d hittVecIn = new Vec3d(81, 76, 172);
             BlockHitResult blockHitResult = new BlockHitResult(
-                    hitVecIn, Direction.EAST, blockPos, false);
+                    hittVecIn, Direction.EAST, blockPos, false);
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
         }
     }

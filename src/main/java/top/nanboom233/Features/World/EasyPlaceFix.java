@@ -14,11 +14,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
 
 import static top.nanboom233.MinamiAddons.mc;
 
+//todo fix piston would failed
 public class EasyPlaceFix {
     private static boolean required = false;
     private static BlockState lastBlockState = null;
@@ -31,18 +31,13 @@ public class EasyPlaceFix {
         lastHitVecIn = hitVecIn;
         lastBlockPos = pos;
         Direction facing = WorldUtils.getFacingValue(state);
-        WorldUtils.EnumFacing axis = null;
-        if (facing != null || axis != null) {
+        if (facing != null) {
             WorldUtils.EnumFacing enumFacing;
-            if (axis != null) {
-                enumFacing = axis;
-            } else {
-                enumFacing = WorldUtils.EnumFacing.getByName(facing.asString());
-            }
+            enumFacing = WorldUtils.EnumFacing.getByName(facing.asString());
             if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
                 return;
             }
-//            ChatUtils.showInChat(String.valueOf(WorldUtils.EnumFacing.getPlacingYaw(block, enumFacing.yaw)), ChatUtils.MessageCategory.DEBUG);
+//            ChatUtils.debug(String.valueOf(WorldUtils.EnumFacing.getPlacingYaw(block, enumFacing.yaw)), ChatUtils.MessageCategory.DEBUG);
             mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                     WorldUtils.EnumFacing.getPlacingYaw(block, enumFacing.yaw),
                     enumFacing.pitch, mc.player.isOnGround()));
@@ -117,7 +112,7 @@ public class EasyPlaceFix {
                     for (int i = 0; i < adjustTimes; i++) {
                         BlockHitResult blockHitResult = new BlockHitResult(
                                 lastHitVecIn, Direction.NORTH, lastBlockPos, false);
-                        ChatUtils.debug("interact!", ChatUtils.MessageCategory.DEBUG);
+//                        ChatUtils.debug("interact!", ChatUtils.MessageCategory.DEBUG);
                         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
                     }
                 }
