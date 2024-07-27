@@ -1,28 +1,47 @@
-package top.nanboom233.Utils;
+package top.nanboom233.Utils.Texts;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Mixins.MixinChatHudAccessor;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static top.nanboom233.Utils.Texts.MinamiStyles.*;
 
 
-/**
- * @author Nanboom233
- */
 public class ChatUtils {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    public static final MessageIndicator minamiIndicater = new MessageIndicator(
-            13684944, null,
-            Text.of("Messages shown by MinamiAddons."), "MinamiAddons");
+    private static final Text description = new MinamiTextComponent("Messages shown by ").withStyles(GRAY)
+            .append(new MinamiTextComponent("MinamiAddons").withStyles(BOLD, GOLD))
+            .append(new MinamiTextComponent(".")).getText();
+    public static final MessageIndicator minamiMainIndicater = new MessageIndicator(
+            233333, null,
+            description, "MinamiAddons");
 
-    public static void showInChat(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of(message), null, minamiIndicater);
+    public static final MessageIndicator deletedIndicater = new MessageIndicator(
+            0, null,
+            Text.literal("This message was deteled."), "MinamiAddons");
+
+    public static void show(MinamiTextComponent text) {
+        mc.inGameHud.getChatHud().addMessage(text.getText(), null, minamiMainIndicater);
     }
 
-    public static void showInChat(String message, MessageCategory messageCategory) {
+    public static void show(MinamiTextComponent text, MessageIndicator indicator) {
+        mc.inGameHud.getChatHud().addMessage(text.getText(), null, indicator);
+    }
+
+    public static void emptyLine() {
+        mc.inGameHud.getChatHud().addMessage(Text.literal(""), null, minamiMainIndicater);
+    }
+
+    public static void emptyLine(MessageIndicator indicator) {
+        mc.inGameHud.getChatHud().addMessage(Text.literal(""), null, indicator);
+    }
+
+    public static void debug(String message, MessageCategory messageCategory) {
         String messagePrefix = "[UNKNOWN] ", messagePrefixColor = "§8";
         switch (messageCategory) {
             case FATAL -> {
@@ -49,15 +68,15 @@ public class ChatUtils {
             }
         }
         message = messagePrefixColor + messagePrefix + message;
-        showInChat(message);
+        show(new MinamiTextComponent(message));
     }
 
     public static String getOldFashionedText(Text styledText) {
+        AtomicBoolean flag = new AtomicBoolean(false);
         StringBuilder oldFashionedText = new StringBuilder();
         styledText.visit((style, text) -> {
             if (style.getColor() != null) {
-                Styles color = Styles.getStyle(style.getColor().getName());
-                System.out.println(color);
+                MinamiStyles color = MinamiStyles.getStyle(style.getColor().getName());
                 if (color != null) {
                     oldFashionedText.append(color.FORMATTING);
                 } else {
@@ -65,19 +84,34 @@ public class ChatUtils {
                 }
             }
             if (style.isObfuscated()) {
-                oldFashionedText.append(Styles.OBFUSCATED.FORMATTING);
+                flag.set(true);
+                oldFashionedText.append(MinamiStyles.OBFUSCATED.FORMATTING);
             }
             if (style.isItalic()) {
-                oldFashionedText.append(Styles.ITALIC.FORMATTING);
+                flag.set(true);
+                oldFashionedText.append(MinamiStyles.ITALIC.FORMATTING);
             }
             if (style.isBold()) {
-                oldFashionedText.append(Styles.BOLD.FORMATTING);
+                flag.set(true);
+                oldFashionedText.append(BOLD.FORMATTING);
             }
             if (style.isStrikethrough()) {
-                oldFashionedText.append(Styles.STRIKE_THROUGH.FORMATTING);
+                flag.set(true);
+                oldFashionedText.append(MinamiStyles.STRIKE_THROUGH.FORMATTING);
             }
             if (style.isUnderlined()) {
-                oldFashionedText.append(Styles.UNDERLINED.FORMATTING);
+                flag.set(true);
+                oldFashionedText.append(MinamiStyles.UNDERLINED.FORMATTING);
+            }
+            if (flag.get() &&
+                    style.getColor() == null &&
+                    !style.isUnderlined() &&
+                    !style.isItalic() &&
+                    !style.isBold() &&
+                    !style.isStrikethrough() &&
+                    !style.isStrikethrough() &&
+                    !style.isObfuscated()) {
+                oldFashionedText.append(RESET.FORMATTING);
             }
             oldFashionedText.append(text);
             return Optional.empty();
@@ -106,7 +140,7 @@ public class ChatUtils {
         }
     }
 
-    public static void sendMessage(String message) {
+    public static void send(String message) {
         if (mc.player == null) {
             return;
         }
@@ -117,52 +151,9 @@ public class ChatUtils {
         }
     }
 
-
-    public enum Styles {
-        BLACK("§0", "black"),
-        DARK_BLUE("§1", "dark_blue"),
-        DARK_GREEN("§2", "dark_green"),
-        DARK_AQUA("§3", "dark_aqua"),
-        DARK_RED("§4", "dark_red"),
-        DARK_PURPLE("§5", "dark_purple"),
-        GOLD("§6", "gold"),
-        GRAY("§7", "gray"),
-        DARK_GRAY("§8", "dark_gray"),
-        BLUE("§9", "blue"),
-        GREEN("§a", "green"),
-        AQUA("§b", "aqua"),
-        RED("§c", "red"),
-        LIGHT_PURPLE("§d", "light_purple"),
-        YELLOW("§e", "yellow"),
-        WHITE("§f", "white"),
-        BOLD("§l", "bold"),
-        ITALIC("§o", "italic"),
-        UNDERLINED("§n", "underlined"),
-        STRIKE_THROUGH("§m", "strike_through"),
-        OBFUSCATED("§k", "obfuscated"),
-        RESET("§r", "reset");
-
-
-        public final String FORMATTING;
-        public final String NAME;
-
-        Styles(String formatting, String name) {
-            this.FORMATTING = formatting;
-            this.NAME = name;
-        }
-
-        @Nullable
-        public static Styles getStyle(String identifier) {
-            for (Styles style : Styles.values()) {
-                if (style.FORMATTING.equals(identifier) || style.NAME.equals(identifier)) {
-                    return style;
-                }
-            }
-            return null;
-        }
-
-        public String setStyle(String text) {
-            return this.FORMATTING + text;
-        }
+    public static void removeMessage(MessageIndicator indicator) {
+        MixinChatHudAccessor chatHud = (MixinChatHudAccessor) mc.inGameHud.getChatHud();
+        chatHud.getMessages().removeIf(chatHudLine -> indicator.equals(chatHudLine.indicator()));
+        chatHud.invokeReset();
     }
 }

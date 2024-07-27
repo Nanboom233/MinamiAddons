@@ -3,7 +3,7 @@ package top.nanboom233.Utils;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import top.nanboom233.Utils.Keybind.KeyCodes;
+import top.nanboom233.Config.Keybind.KeyCodes;
 
 public class KeyboardUtils {
     public static boolean isKeyDown(int keyCode) {
