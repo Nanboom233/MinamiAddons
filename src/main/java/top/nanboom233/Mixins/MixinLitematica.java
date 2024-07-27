@@ -14,7 +14,7 @@ import top.nanboom233.Features.World.EasyPlaceFix;
 
 import static top.nanboom233.MinamiAddons.config;
 
-@Mixin(WorldUtils.class)
+@Mixin(value = WorldUtils.class, priority = 1010)
 public class MixinLitematica {
     @Inject(
             method = "applyBlockSlabProtocol",

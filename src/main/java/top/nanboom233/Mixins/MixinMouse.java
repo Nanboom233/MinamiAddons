@@ -9,10 +9,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.nanboom233.Config.Config;
+import top.nanboom233.Config.Keybind.KeyCodes;
 import top.nanboom233.Features.Player.ChatCopy;
-import top.nanboom233.Utils.Keybind.KeyCodes;
 import top.nanboom233.Utils.KeyboardUtils;
+
+import static top.nanboom233.MinamiAddons.config;
 
 @Mixin(Mouse.class)
 public class MixinMouse {
@@ -25,7 +26,7 @@ public class MixinMouse {
             at = @At("RETURN")
     )
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo info) {
-        if (!Config.getInstance().chatCopy) {
+        if (!config.chatCopy) {
             return;
         }
         boolean bl = action == 1;

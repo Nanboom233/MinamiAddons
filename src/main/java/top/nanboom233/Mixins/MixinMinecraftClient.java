@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import top.nanboom233.Config.Keybind.MultiKeybind;
 import top.nanboom233.Handlers.TickHandler;
-import top.nanboom233.Utils.Keybind.MultiKeybind;
 
 
 @Mixin(MinecraftClient.class)
@@ -16,7 +16,6 @@ public class MixinMinecraftClient {
             at = @At("HEAD")
     )
     private void init(CallbackInfo info) {
-        // This code is injected into the start of MinecraftClient.run()V
     }
 
     @Inject(
@@ -24,7 +23,7 @@ public class MixinMinecraftClient {
             at = @At("RETURN")
     )
     private void onTick(CallbackInfo ci) {
-        MultiKeybind.reCheckPressedKeys();
+        MultiKeybind.onKeyRelease();
         TickHandler.getInstance().onClientEndTick((MinecraftClient) (Object) this);
     }
 }

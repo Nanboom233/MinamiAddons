@@ -23,9 +23,13 @@ public interface MixinChatHudAccessor {
     @Invoker("getMessageLineIndex")
     int invokeGetMessageLineIndex(double chatLineX, double chatLineY);
 
+    @Invoker("reset")
+    void invokeReset();
+
     @Accessor("visibleMessages")
     List<ChatHudLine.Visible> getVisibleMessages();
 
     @Accessor("messages")
     List<ChatHudLine> getMessages();
+
 }
