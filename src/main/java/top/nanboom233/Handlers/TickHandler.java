@@ -9,12 +9,12 @@ import java.util.Objects;
 public class TickHandler {
     private static final TickHandler INSTANCE = new TickHandler();
     private static final ArrayList<ITickTask> tasks = new ArrayList<>();
+    private static final ArrayList<ITickTask> removalQueue = new ArrayList<>();
+    private long lastAlert = -1;
 
     public static TickHandler getInstance() {
         return INSTANCE;
     }
-
-    private long lastAlert = -1;
 
     public void onClientEndTick(MinecraftClient mc) {
         if (!tasks.isEmpty()) {
@@ -34,11 +34,17 @@ public class TickHandler {
                 tasks.removeIf(Objects::isNull);
                 MinamiAddons.getLogger().fatal("Current length of the tasks:" + tasks.size());
             }
+            tasks.removeAll(removalQueue);
+            removalQueue.clear();
         }
     }
 
     public void register(ITickTask task) {
         tasks.add(task);
+    }
+
+    public void unregister(ITickTask task) {
+        removalQueue.add(task);
     }
 
     @FunctionalInterface
