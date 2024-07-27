@@ -11,7 +11,11 @@
   "mixins": [
     "MixinChatHud",
     "MixinChatHudAccessor",
+    "MixinClientCommonNetworkHandler",
+    "MixinCommandManager",
     "MixinKeyboard",
+    "MixinLitematica",
+    "MixinMinecraftClientAccessor",
     "MixinMouse"
   ]
 }
