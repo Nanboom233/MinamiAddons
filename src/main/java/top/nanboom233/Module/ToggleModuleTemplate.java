@@ -1,10 +1,10 @@
 package top.nanboom233.Module;
 
 import org.jetbrains.annotations.NotNull;
-import top.nanboom233.Utils.ChatUtils;
-import top.nanboom233.Utils.Keybind.MultiKeybind;
+import top.nanboom233.Config.Keybind.MultiKeybind;
+import top.nanboom233.Utils.Texts.ChatUtils;
 
-import static top.nanboom233.Utils.ChatUtils.MessageCategory.INFO;
+import static top.nanboom233.Utils.Texts.ChatUtils.MessageCategory.INFO;
 
 /**
  * @author Nanboom233
@@ -41,11 +41,11 @@ public abstract class ToggleModuleTemplate extends ModuleTemplate {
     }
 
     protected void onEnable() {
-        ChatUtils.showInChat(moduleName + " is now §2Enabled§r.", INFO);
+        ChatUtils.debug(moduleName + " is now §2Enabled§r.", INFO);
     }
 
     protected void onDisable() {
-        ChatUtils.showInChat(moduleName + " is now §4Disabled§r.", INFO);
+        ChatUtils.debug(moduleName + " is now §4Disabled§r.", INFO);
     }
 
     protected void tick() {

@@ -1,4 +1,4 @@
-package top.nanboom233.Utils.Keybind;
+package top.nanboom233.Config.Keybind;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -155,21 +155,13 @@ public class KeyCodes {
 
     static {
         MAP_NAME_TO_KEY.defaultReturnValue(KEY_NONE);
+        MAP_KEY_TO_NAME.defaultReturnValue(null);
 
         for (Field field : KeyCodes.class.getDeclaredFields()) {
             try {
                 String name = field.getName();
-                int keyCode = KEY_NONE;
-
-                if (name.startsWith("KEY_")) {
-                    name = name.substring(4);
-                    keyCode = field.getInt(null);
-                } else if (name.startsWith("MOUSE_")) {
-                    name = name.substring(6);
-                    keyCode = field.getInt(null);
-                }
-
-                if (keyCode != KEY_NONE) {
+                if (name.startsWith("KEY_") || name.startsWith("MOUSE_")) {
+                    int keyCode = field.getInt(null);
                     MAP_KEY_TO_NAME.put(keyCode, name);
                     MAP_NAME_TO_KEY.put(name, keyCode);
                 }

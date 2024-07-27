@@ -31,7 +31,7 @@ public class ModuleManager {
                 }
                 break;
             }
-            if (module.keyBinding.wasPressed()) {
+            if (module.keybind.isTriggered()) {
                 module.trigger();
             }
             if (module instanceof ToggleModuleTemplate && ((ToggleModuleTemplate) module).state) {
@@ -66,5 +66,9 @@ public class ModuleManager {
             }
         }
         return false;
+    }
+
+    public ArrayList<ModuleTemplate> getModuleList() {
+        return moduleList;
     }
 }
