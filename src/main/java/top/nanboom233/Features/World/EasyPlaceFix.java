@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
 
 import static top.nanboom233.MinamiAddons.mc;
@@ -116,6 +117,7 @@ public class EasyPlaceFix {
                     for (int i = 0; i < adjustTimes; i++) {
                         BlockHitResult blockHitResult = new BlockHitResult(
                                 lastHitVecIn, Direction.NORTH, lastBlockPos, false);
+                        ChatUtils.debug("interact!", ChatUtils.MessageCategory.DEBUG);
                         mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
                     }
                 }

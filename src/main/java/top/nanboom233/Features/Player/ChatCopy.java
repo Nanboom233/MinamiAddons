@@ -2,9 +2,10 @@ package top.nanboom233.Features.Player;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHudLine;
+import top.nanboom233.Config.Config;
 import top.nanboom233.MinamiAddons;
 import top.nanboom233.Mixins.MixinChatHudAccessor;
-import top.nanboom233.Utils.ChatUtils;
+import top.nanboom233.Utils.Texts.ChatUtils;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -13,16 +14,17 @@ import java.util.regex.Pattern;
 import static top.nanboom233.MinamiAddons.mc;
 
 public class ChatCopy {
+
     public static void regularCopy() {
         ChatHudLine text = getChatLine(getMouseX(), getMouseY());
         if (text == null) {
             return;
         }
-        if (text.indicator() == ChatUtils.minamiIndicater) {
+        if (Config.copyWhiteList.contains(text.indicator())) {
             return;
         }
         mc.keyboard.setClipboard(text.content().getString().replaceAll("[\\u00a7&][0-9a-zA-Z]", ""));
-        ChatUtils.showInChat("Copied to clipboard!", ChatUtils.MessageCategory.DEBUG);
+        ChatUtils.debug("Copied to clipboard!", ChatUtils.MessageCategory.DEBUG);
     }
 
     public static void styledCopy() {
@@ -30,13 +32,13 @@ public class ChatCopy {
         if (text == null) {
             return;
         }
-        if (text.indicator() == ChatUtils.minamiIndicater) {
+        if (Config.copyWhiteList.contains(text.indicator())) {
             return;
         }
         Pattern pattern = Pattern.compile("((?<!\\\\))\u00a7(?![^0-9a-fklmnor]|$)");
         Matcher matcher = pattern.matcher(ChatUtils.getOldFashionedText(text.content()));
         mc.keyboard.setClipboard(matcher.replaceAll("&"));
-        ChatUtils.showInChat("Copied to clipboard with styles!", ChatUtils.MessageCategory.DEBUG);
+        ChatUtils.debug("Copied to clipboard with styles!", ChatUtils.MessageCategory.DEBUG);
     }
 
     private static ChatHudLine getChatLine(double x, double y) {

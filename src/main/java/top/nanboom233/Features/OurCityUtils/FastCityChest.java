@@ -3,24 +3,24 @@ package top.nanboom233.Features.OurCityUtils;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import top.nanboom233.Config.Keybind.MultiKeybind;
 import top.nanboom233.Module.ToggleModuleTemplate;
-import top.nanboom233.Utils.ChatUtils;
-import top.nanboom233.Utils.Keybind.AdvancedKeybind;
-import top.nanboom233.Utils.Keybind.KeyCodes;
-import top.nanboom233.Utils.Keybind.MultiKeybind;
+import top.nanboom233.Utils.Texts.ChatUtils;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
+import static top.nanboom233.Config.Keybind.MultiKeybind.KeyActionType.PRESS;
+import static top.nanboom233.Config.Keybind.MultiKeybind.scopeType.INGAME;
 import static top.nanboom233.MinamiAddons.mc;
-import static top.nanboom233.Utils.Keybind.AdvancedKeybind.KeyTriggerType.INGAME;
 
 public class FastCityChest extends ToggleModuleTemplate {
     public static final String moduleName = "FastCityChest";
     public static final String description = "Open the city's chest instantly.";
     private static long moduleStartTime = -1L;
 
-    private static final MultiKeybind keyBinding = new MultiKeybind(new AdvancedKeybind(INGAME, true, new HashSet<>(Set.of(KeyCodes.KEY_P))));
+    private static final MultiKeybind keyBinding = new MultiKeybind(
+            Set.of(KEY_NONE), INGAME, PRESS, false);
 
     public FastCityChest() {
         super(moduleName, description, keyBinding);
@@ -29,7 +29,7 @@ public class FastCityChest extends ToggleModuleTemplate {
     @Override
     protected void onEnable() {
         moduleStartTime = System.currentTimeMillis();
-        ChatUtils.sendMessage("/oc");
+        ChatUtils.send("/oc");
     }
 
     @Override
