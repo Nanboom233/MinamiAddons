@@ -18,8 +18,6 @@ import top.nanboom233.Utils.WorldUtils;
 import static top.nanboom233.MinamiAddons.mc;
 import static top.nanboom233.Utils.WorldUtils.*;
 
-//todo fix piston would failed
-//todo fix trapdoor states
 public class EasyPlaceFix {
     private static boolean povRecovery = false;
     private static boolean sneakRecovery = false;
