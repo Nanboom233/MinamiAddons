@@ -1,5 +1,6 @@
 package top.nanboom233.Module;
 
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -27,10 +28,12 @@ public class ExampleInstantModule extends ModuleTemplate {
     protected void trigger() {
         super.trigger();
         if (mc.interactionManager != null && mc.player != null) {
-            BlockPos blockPos = new BlockPos(81, 76, 172);
-            Vec3d hittVecIn = new Vec3d(81, 76, 172);
+            BlockPos blockPos = new BlockPos(-68, 72, 402);
+            Vec3d hittVecIn = new Vec3d(-68, 72, 402);
             BlockHitResult blockHitResult = new BlockHitResult(
-                    hittVecIn, Direction.EAST, blockPos, false);
+                    hittVecIn, Direction.WEST, blockPos, false);
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(),
+                    180, 0, mc.player.isOnGround()));
             mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
         }
     }

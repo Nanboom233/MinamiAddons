@@ -3,12 +3,14 @@ package top.nanboom233.Mixins;
 import fi.dy.masa.litematica.util.WorldUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.nanboom233.Features.World.EasyPlaceFix;
 
@@ -18,13 +20,25 @@ import static top.nanboom233.MinamiAddons.config;
 public class MixinLitematica {
     @Inject(
             method = "applyBlockSlabProtocol",
-            at = @At("HEAD")
+            at = @At("RETURN")
     )
     private static void fixMovePacket(BlockPos pos, BlockState state, Vec3d hitVecIn, CallbackInfoReturnable<Vec3d> cir) {
         if (!config.easyPlaceFix) {
             return;
         }
-        EasyPlaceFix.beforePlacement(pos, state, hitVecIn);
+        EasyPlaceFix.applyMovementPacket(pos, state, cir.getReturnValue());
+    }
+
+
+    @ModifyVariable(
+            method = "doEasyPlaceAction",
+            at = @At(
+                    value = "STORE"
+            ),
+            name = "hitResult"
+    )
+    private static BlockHitResult redirectPlacement(BlockHitResult hitResult) {
+        return EasyPlaceFix.redirectPlacement(hitResult);
     }
 
     @Inject(

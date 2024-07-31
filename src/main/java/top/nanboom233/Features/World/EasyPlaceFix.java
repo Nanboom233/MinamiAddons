@@ -1,10 +1,9 @@
 package top.nanboom233.Features.World;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.TrapdoorBlock;
+import net.minecraft.block.*;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
@@ -17,42 +16,116 @@ import org.jetbrains.annotations.Nullable;
 import top.nanboom233.Utils.WorldUtils;
 
 import static top.nanboom233.MinamiAddons.mc;
+import static top.nanboom233.Utils.WorldUtils.*;
 
 //todo fix piston would failed
+//todo fix trapdoor states
 public class EasyPlaceFix {
-    private static boolean required = false;
+    private static boolean povRecovery = false;
+    private static boolean sneakRecovery = false;
     private static BlockState lastBlockState = null;
     private static BlockPos lastBlockPos = null;
     private static Vec3d lastHitVecIn = null;
+    private static EnumFacing lastEnumFacing = null;
 
-    public static void beforePlacement(BlockPos pos, BlockState state, Vec3d hitVecIn) {
+    public static void applyMovementPacket(BlockPos pos, BlockState state, Vec3d hitVecIn) {
         Block block = state.getBlock();
         lastBlockState = state;
         lastHitVecIn = hitVecIn;
         lastBlockPos = pos;
         Direction facing = WorldUtils.getFacingValue(state);
         if (facing != null) {
-            WorldUtils.EnumFacing enumFacing;
-            enumFacing = WorldUtils.EnumFacing.getByName(facing.asString());
+            EnumFacing enumFacing = EnumFacing.getByName(facing.asString());
             if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
                 return;
             }
-//            ChatUtils.debug(String.valueOf(WorldUtils.EnumFacing.getPlacingYaw(block, enumFacing.yaw)), ChatUtils.MessageCategory.DEBUG);
+//            ChatUtils.debug("before yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
+//            ChatUtils.debug("after yaw: " + getPlacingYaw(block, enumFacing.yaw) + " ,after pitch: " + getPlacingPitch(block, enumFacing.pitch), ChatUtils.MessageCategory.DEBUG);
+            if (OPPOSITE_PLACING_BLOCKS.contains(block.getDefaultState().getBlock())) {
+                enumFacing = enumFacing.getOpposite();
+            }
             mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-                    WorldUtils.EnumFacing.getPlacingYaw(block, enumFacing.yaw),
-                    enumFacing.pitch, mc.player.isOnGround()));
-            required = true;
+                    enumFacing.yaw, enumFacing.pitch, mc.player.isOnGround()));
+            povRecovery = true;
+            lastEnumFacing = enumFacing;
         }
     }
 
+    public static BlockHitResult redirectPlacement(BlockHitResult hitResult) {
+        BlockPos blockPos = hitResult.getBlockPos();
+        Vec3d hitVecIn = hitResult.getPos();
+        Direction direction = hitResult.getSide();
+        boolean insideBlock = hitResult.isInsideBlock();
+
+        if (povRecovery && mc.player != null && mc.getNetworkHandler() != null && lastEnumFacing != null) {
+            Block block = lastBlockState.getBlock();
+
+//          sneak when placing chest
+            if (block instanceof ChestBlock) {
+                mc.player.input.sneaking = true;
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
+                        mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+                sneakRecovery = true;
+
+                for (Property<?> prop : lastBlockState.getProperties()) {
+                    Comparable<?> val = lastBlockState.get(prop);
+                    if (prop instanceof EnumProperty && "type".equals(prop.getName())) {
+                        String chestType = val.toString();
+                        switch (chestType) {
+                            case "LEFT":
+                                BlockPos leftBlockPos = getLeftBlockPos(blockPos, lastEnumFacing);
+                                if (mc.world != null
+                                        && mc.world.getBlockState(leftBlockPos).getBlock() == Blocks.CHEST) {
+//                                    System.err.println("left");
+                                    return new BlockHitResult(getBlockCorner(leftBlockPos),
+                                            lastEnumFacing.getRight().direction, leftBlockPos, insideBlock);
+                                }
+                                break;
+                            case "RIGHT":
+                                BlockPos rightBlockPos = getRightBlockPos(blockPos, lastEnumFacing);
+                                if (mc.world != null
+                                        && mc.world.getBlockState(rightBlockPos).getBlock() == Blocks.CHEST) {
+//                                    System.err.println("right");
+                                    return new BlockHitResult(getBlockCorner(rightBlockPos),
+                                            lastEnumFacing.getLeft().direction, rightBlockPos, insideBlock);
+                                }
+                                break;
+                        }
+//                        System.err.println("single");
+                        return new BlockHitResult(getUnderSurface(blockPos),
+                                Direction.UP, blockPos, insideBlock);
+                    }
+                }
+            }
+
+            //fix door's hinge
+            if (block instanceof DoorBlock) {
+                for (Property<?> prop : lastBlockState.getProperties()) {
+                    Comparable<?> val = lastBlockState.get(prop);
+                    if (prop instanceof EnumProperty && "hinge".equals(prop.getName())) {
+                        if ("left".equals(val.toString())) {
+                            return new BlockHitResult(getLeftSurface(blockPos, lastEnumFacing),
+                                    direction, blockPos, insideBlock);
+                        } else {
+                            return new BlockHitResult(getRightSurface(blockPos, lastEnumFacing),
+                                    direction, blockPos, insideBlock);
+                        }
+                    }
+                }
+            }
+        }
+        return hitResult;
+    }
+
     @Nullable
-    public static Direction directionFix(BlockState state, Direction originalDirection) {
-//        System.out.println("old : " + originalDirection);
-        Direction facing = top.nanboom233.Utils.WorldUtils.getFacingValue(state);
-        Block block = state.getBlock();
+    public static Direction directionFix(BlockState schematicState, Direction originalDirection) {
+//        System.err.println("old: " + originalDirection);
+        Direction facing = top.nanboom233.Utils.WorldUtils.getFacingValue(schematicState);
+//        System.err.println("required: " + facing);
+        Block block = schematicState.getBlock();
         if (block == Blocks.CHAIN) {
-            for (Property<?> prop : state.getProperties()) {
-                Comparable<?> val = state.get(prop);
+            for (Property<?> prop : schematicState.getProperties()) {
+                Comparable<?> val = schematicState.get(prop);
                 if (prop instanceof EnumProperty) {
                     facing = switch (val.toString()) {
                         case "z" -> Direction.NORTH;
@@ -71,24 +144,24 @@ public class EasyPlaceFix {
             Direction newFacing = facing;
             if (top.nanboom233.Utils.WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block)) {
                 newFacing = switch (facing) {
-                    case DOWN -> Direction.DOWN;
-                    case UP -> Direction.UP;
+                    case DOWN -> Direction.UP;
+                    case UP -> Direction.DOWN;
                     case NORTH -> Direction.SOUTH;
                     case EAST -> Direction.WEST;
                     case SOUTH -> Direction.NORTH;
                     case WEST -> Direction.EAST;
                 };
             }
-//            System.err.println("new :" + newFacing);
+//            System.err.println("new: " + newFacing);
             return newFacing;
         }
         return null;
     }
 
     public static void afterPlacement() {
-        if (required && lastBlockState != null) {
+        if (povRecovery && lastBlockState != null) {
             Block block = lastBlockState.getBlock();
-            if (block == Blocks.REPEATER || block == Blocks.COMPARATOR) {
+            if (WorldUtils.ADJUST_PLACING_BLOCKS.contains(block)) {
                 int adjustTimes = 0;
                 if (block == Blocks.REPEATER) {
                     for (Property<?> prop : lastBlockState.getProperties()) {
@@ -98,11 +171,20 @@ public class EasyPlaceFix {
                             break;
                         }
                     }
-                }
-                if (block == Blocks.COMPARATOR) {
+                } else if (block == Blocks.COMPARATOR) {
                     for (Property<?> prop : lastBlockState.getProperties()) {
                         Comparable<?> val = lastBlockState.get(prop);
                         if (prop instanceof EnumProperty && "subtract".equals(val.toString())) {
+                            adjustTimes = 1;
+                            break;
+                        }
+                    }
+                } else if (block instanceof TrapdoorBlock
+                        || block instanceof FenceGateBlock
+                        || block instanceof DoorBlock) {
+                    for (Property<?> prop : lastBlockState.getProperties()) {
+                        Comparable<?> val = lastBlockState.get(prop);
+                        if (prop instanceof BooleanProperty && "open".equals(prop.getName()) && "true".equals(val.toString())) {
                             adjustTimes = 1;
                             break;
                         }
@@ -118,10 +200,17 @@ public class EasyPlaceFix {
                 }
             }
         }
-        if (required && mc.player != null && mc.getNetworkHandler() != null) {
+
+        if (povRecovery && mc.player != null && mc.getNetworkHandler() != null) {
             mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                     mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
-            required = false;
+            povRecovery = false;
+        }
+
+        if (sneakRecovery && mc.player != null && mc.getNetworkHandler() != null) {
+            mc.player.input.sneaking = false;
+            mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
+                    mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
         }
     }
 }
