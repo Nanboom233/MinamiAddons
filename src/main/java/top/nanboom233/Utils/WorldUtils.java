@@ -18,7 +18,7 @@ import java.util.Set;
 public class WorldUtils {
     public static final HashSet<Block> OPPOSITE_PLACING_BLOCKS = new HashSet<>(Set.of(
             //chests
-            Blocks.CHEST, Blocks.TRAPPED_CHEST,
+            Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.ENDER_CHEST,
 
             //pistons
             Blocks.PISTON, Blocks.STICKY_PISTON,
