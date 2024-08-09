@@ -13,7 +13,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
 import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
@@ -41,7 +40,7 @@ public class EasyPlaceFix {
         if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
             return;
         }
-        ChatUtils.debug("enumFacing:" + enumFacing.name, ChatUtils.MessageCategory.DEBUG);
+//        ChatUtils.debug("enumFacing:" + enumFacing.name, ChatUtils.MessageCategory.DEBUG);
 //        ChatUtils.debug("before yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
 //        ChatUtils.debug("after yaw: " + getPlacingYaw(block, enumFacing.yaw) + " ,after pitch: " + getPlacingPitch(block, enumFacing.pitch), ChatUtils.MessageCategory.DEBUG);
         if (WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block.getDefaultState().getBlock())) {
