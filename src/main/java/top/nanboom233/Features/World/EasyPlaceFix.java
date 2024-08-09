@@ -13,10 +13,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
+import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
 import static top.nanboom233.MinamiAddons.mc;
-import static top.nanboom233.Utils.WorldUtils.*;
 
 public class EasyPlaceFix {
     private static boolean povRecovery = false;
@@ -31,22 +32,26 @@ public class EasyPlaceFix {
         lastBlockState = state;
         lastHitVecIn = hitVecIn;
         lastBlockPos = pos;
-        Direction facing = WorldUtils.getFacingValue(state);
-        if (facing != null) {
-            EnumFacing enumFacing = EnumFacing.getByName(facing.asString());
-            if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
-                return;
-            }
-//            ChatUtils.debug("before yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
-//            ChatUtils.debug("after yaw: " + getPlacingYaw(block, enumFacing.yaw) + " ,after pitch: " + getPlacingPitch(block, enumFacing.pitch), ChatUtils.MessageCategory.DEBUG);
-            if (OPPOSITE_PLACING_BLOCKS.contains(block.getDefaultState().getBlock())) {
-                enumFacing = enumFacing.getOpposite();
-            }
-            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-                    enumFacing.yaw, enumFacing.pitch, mc.player.isOnGround()));
-            povRecovery = true;
-            lastEnumFacing = enumFacing;
+        for (Property<?> prop : state.getProperties()) {
+            Comparable<?> val = state.get(prop);
+            System.out.println(prop + ": " + val);
         }
+
+        EnumFacing enumFacing = WorldUtils.getEnumFacing(state);
+        if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
+            return;
+        }
+        ChatUtils.debug("enumFacing:" + enumFacing.name, ChatUtils.MessageCategory.DEBUG);
+//        ChatUtils.debug("before yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
+//        ChatUtils.debug("after yaw: " + getPlacingYaw(block, enumFacing.yaw) + " ,after pitch: " + getPlacingPitch(block, enumFacing.pitch), ChatUtils.MessageCategory.DEBUG);
+        if (WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block.getDefaultState().getBlock())) {
+            enumFacing = enumFacing.getOpposite();
+        }
+        mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+                enumFacing.yaw, enumFacing.pitch, mc.player.isOnGround()));
+        povRecovery = true;
+        lastEnumFacing = enumFacing;
+
     }
 
     public static BlockHitResult redirectPlacement(BlockHitResult hitResult) {
@@ -71,26 +76,26 @@ public class EasyPlaceFix {
                         String chestType = val.toString();
                         switch (chestType) {
                             case "LEFT":
-                                BlockPos leftBlockPos = getLeftBlockPos(blockPos, lastEnumFacing);
+                                BlockPos leftBlockPos = WorldUtils.getLeftBlockPos(blockPos, lastEnumFacing);
                                 if (mc.world != null
                                         && mc.world.getBlockState(leftBlockPos).getBlock() == Blocks.CHEST) {
 //                                    System.err.println("left");
-                                    return new BlockHitResult(getBlockCorner(leftBlockPos),
+                                    return new BlockHitResult(WorldUtils.getBlockCorner(leftBlockPos),
                                             lastEnumFacing.getRight().direction, leftBlockPos, insideBlock);
                                 }
                                 break;
                             case "RIGHT":
-                                BlockPos rightBlockPos = getRightBlockPos(blockPos, lastEnumFacing);
+                                BlockPos rightBlockPos = WorldUtils.getRightBlockPos(blockPos, lastEnumFacing);
                                 if (mc.world != null
                                         && mc.world.getBlockState(rightBlockPos).getBlock() == Blocks.CHEST) {
 //                                    System.err.println("right");
-                                    return new BlockHitResult(getBlockCorner(rightBlockPos),
+                                    return new BlockHitResult(WorldUtils.getBlockCorner(rightBlockPos),
                                             lastEnumFacing.getLeft().direction, rightBlockPos, insideBlock);
                                 }
                                 break;
                         }
 //                        System.err.println("single");
-                        return new BlockHitResult(getUnderSurface(blockPos),
+                        return new BlockHitResult(WorldUtils.getUnderSurface(blockPos),
                                 Direction.UP, blockPos, insideBlock);
                     }
                 }
@@ -102,10 +107,10 @@ public class EasyPlaceFix {
                     Comparable<?> val = lastBlockState.get(prop);
                     if (prop instanceof EnumProperty && "hinge".equals(prop.getName())) {
                         if ("left".equals(val.toString())) {
-                            return new BlockHitResult(getLeftSurface(blockPos, lastEnumFacing),
+                            return new BlockHitResult(WorldUtils.getLeftSurface(blockPos, lastEnumFacing),
                                     direction, blockPos, insideBlock);
                         } else {
-                            return new BlockHitResult(getRightSurface(blockPos, lastEnumFacing),
+                            return new BlockHitResult(WorldUtils.getRightSurface(blockPos, lastEnumFacing),
                                     direction, blockPos, insideBlock);
                         }
                     }
@@ -118,8 +123,12 @@ public class EasyPlaceFix {
     @Nullable
     public static Direction directionFix(BlockState schematicState, Direction originalDirection) {
 //        System.err.println("old: " + originalDirection);
-        Direction facing = top.nanboom233.Utils.WorldUtils.getFacingValue(schematicState);
-//        System.err.println("required: " + facing);
+        EnumFacing enumFacing = WorldUtils.getEnumFacing(schematicState);
+        Direction facing = null;
+        if (enumFacing != null) {
+            facing = enumFacing.direction;
+        }
+
         Block block = schematicState.getBlock();
         if (block == Blocks.CHAIN) {
             for (Property<?> prop : schematicState.getProperties()) {
@@ -129,7 +138,7 @@ public class EasyPlaceFix {
                         case "z" -> Direction.NORTH;
                         case "x" -> Direction.EAST;
                         case "y" -> Direction.DOWN;
-                        default -> facing;
+                        default -> null;
                     };
                 }
             }
@@ -138,6 +147,8 @@ public class EasyPlaceFix {
                 (originalDirection == Direction.UP || originalDirection == Direction.DOWN)) {
             return null;
         }
+
+//        System.err.println("required: " + facing);
         if (facing != null) {
             Direction newFacing = facing;
             if (top.nanboom233.Utils.WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block)) {
