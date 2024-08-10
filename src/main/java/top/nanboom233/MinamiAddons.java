@@ -17,7 +17,7 @@ import top.nanboom233.Module.ModuleManager;
  */
 public class MinamiAddons implements ClientModInitializer {
     public static final String MOD_NAME = "MinamiAddons";
-    public static final String MOD_VERSION = "0.2.1-dev";
+    public static final String MOD_VERSION = "0.2.2";
     public static final String MOD_ID = "minamiaddons";
     private static final Logger logger = LogManager.getLogger(MOD_ID);
     public static final ModuleManager moduleManager = ModuleManager.getInstance();
