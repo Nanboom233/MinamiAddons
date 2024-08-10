@@ -13,9 +13,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Handlers.TickHandler;
 import top.nanboom233.Utils.WorldUtils;
 import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
+import java.util.ArrayList;
+
+import static top.nanboom233.MinamiAddons.config;
 import static top.nanboom233.MinamiAddons.mc;
 
 public class EasyPlaceFix {
@@ -25,17 +29,14 @@ public class EasyPlaceFix {
     private static BlockPos lastBlockPos = null;
     private static Vec3d lastHitVecIn = null;
     private static EnumFacing lastEnumFacing = null;
+    private static final ArrayList<AdjustInfo> adjustList = new ArrayList<>();
+    private static final int MAX_ADJUST_PER_TICK = 2;
+    private static long lastAdjust = -1;
+    private static final long ADJUST_AWAIT_TIME = 55L;
 
     public static void applyMovementPacket(BlockPos pos, BlockState state, Vec3d hitVecIn) {
         Block block = state.getBlock();
-        lastBlockState = state;
-        lastHitVecIn = hitVecIn;
-        lastBlockPos = pos;
-        for (Property<?> prop : state.getProperties()) {
-            Comparable<?> val = state.get(prop);
-            System.out.println(prop + ": " + val);
-        }
-
+        setLastInfo(state, pos, hitVecIn);
         EnumFacing enumFacing = WorldUtils.getEnumFacing(state);
         if (enumFacing == null || mc.getNetworkHandler() == null || mc.player == null) {
             return;
@@ -50,7 +51,6 @@ public class EasyPlaceFix {
                 enumFacing.yaw, enumFacing.pitch, mc.player.isOnGround()));
         povRecovery = true;
         lastEnumFacing = enumFacing;
-
     }
 
     public static BlockHitResult redirectPlacement(BlockHitResult hitResult) {
@@ -122,26 +122,13 @@ public class EasyPlaceFix {
     @Nullable
     public static Direction directionFix(BlockState schematicState, Direction originalDirection) {
 //        System.err.println("old: " + originalDirection);
+        Block block = schematicState.getBlock();
         EnumFacing enumFacing = WorldUtils.getEnumFacing(schematicState);
         Direction facing = null;
         if (enumFacing != null) {
             facing = enumFacing.direction;
         }
 
-        Block block = schematicState.getBlock();
-        if (block == Blocks.CHAIN) {
-            for (Property<?> prop : schematicState.getProperties()) {
-                Comparable<?> val = schematicState.get(prop);
-                if (prop instanceof EnumProperty) {
-                    facing = switch (val.toString()) {
-                        case "z" -> Direction.NORTH;
-                        case "x" -> Direction.EAST;
-                        case "y" -> Direction.DOWN;
-                        default -> null;
-                    };
-                }
-            }
-        }
         if (block instanceof TrapdoorBlock &&
                 (originalDirection == Direction.UP || originalDirection == Direction.DOWN)) {
             return null;
@@ -151,14 +138,7 @@ public class EasyPlaceFix {
         if (facing != null) {
             Direction newFacing = facing;
             if (top.nanboom233.Utils.WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block)) {
-                newFacing = switch (facing) {
-                    case DOWN -> Direction.UP;
-                    case UP -> Direction.DOWN;
-                    case NORTH -> Direction.SOUTH;
-                    case EAST -> Direction.WEST;
-                    case SOUTH -> Direction.NORTH;
-                    case WEST -> Direction.EAST;
-                };
+                newFacing = facing.getOpposite();
             }
 //            System.err.println("new: " + newFacing);
             return newFacing;
@@ -167,44 +147,40 @@ public class EasyPlaceFix {
     }
 
     public static void afterPlacement() {
-        if (povRecovery && lastBlockState != null) {
+        if (lastBlockState != null) {
             Block block = lastBlockState.getBlock();
             if (WorldUtils.ADJUST_PLACING_BLOCKS.contains(block)) {
                 int adjustTimes = 0;
                 if (block == Blocks.REPEATER) {
-                    for (Property<?> prop : lastBlockState.getProperties()) {
+                    Property<?> prop = WorldUtils.getBlockPropertyByName(lastBlockState, "delay");
+                    if (prop instanceof IntProperty) {
                         Comparable<?> val = lastBlockState.get(prop);
-                        if (prop instanceof IntProperty && "delay".equals(prop.getName())) {
-                            adjustTimes = Integer.parseInt(val.toString()) - 1;
-                            break;
-                        }
+                        adjustTimes = Integer.parseInt(val.toString()) - 1;
                     }
                 } else if (block == Blocks.COMPARATOR) {
-                    for (Property<?> prop : lastBlockState.getProperties()) {
+                    Property<?> prop = WorldUtils.getBlockPropertyByName(lastBlockState, "mode");
+                    if (prop instanceof EnumProperty) {
                         Comparable<?> val = lastBlockState.get(prop);
-                        if (prop instanceof EnumProperty && "subtract".equals(val.toString())) {
-                            adjustTimes = 1;
-                            break;
-                        }
+                        adjustTimes = "subtract".equals(val.toString()) ? 1 : 0;
                     }
                 } else if (block instanceof TrapdoorBlock
                         || block instanceof FenceGateBlock
                         || block instanceof DoorBlock) {
-                    for (Property<?> prop : lastBlockState.getProperties()) {
+                    Property<?> prop = WorldUtils.getBlockPropertyByName(lastBlockState, "open");
+                    if (prop instanceof BooleanProperty) {
                         Comparable<?> val = lastBlockState.get(prop);
-                        if (prop instanceof BooleanProperty && "open".equals(prop.getName()) && "true".equals(val.toString())) {
-                            adjustTimes = 1;
-                            break;
-                        }
+                        adjustTimes = "true".equals(val.toString()) ? 1 : 0;
+                    }
+                } else if (block == Blocks.NOTE_BLOCK) {
+                    Property<?> prop = WorldUtils.getBlockPropertyByName(lastBlockState, "note");
+                    System.out.println(prop);
+                    if (prop instanceof IntProperty) {
+                        Comparable<?> val = lastBlockState.get(prop);
+                        adjustTimes = Integer.parseInt(val.toString());
                     }
                 }
-                if (mc.interactionManager != null && mc.player != null) {
-                    for (int i = 0; i < adjustTimes; i++) {
-                        BlockHitResult blockHitResult = new BlockHitResult(
-                                lastHitVecIn, Direction.NORTH, lastBlockPos, false);
-//                        ChatUtils.debug("interact!", ChatUtils.MessageCategory.DEBUG);
-                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
-                    }
+                if (adjustTimes != 0) {
+                    adjustList.add(new AdjustInfo(lastBlockState, lastBlockPos, lastHitVecIn, lastEnumFacing, adjustTimes));
                 }
             }
         }
@@ -219,6 +195,71 @@ public class EasyPlaceFix {
             mc.player.input.sneaking = false;
             mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
                     mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+        }
+
+        resetLastInfo();
+    }
+
+    private static void resetLastInfo() {
+        lastBlockState = null;
+        lastBlockPos = null;
+        lastHitVecIn = null;
+        lastEnumFacing = null;
+    }
+
+    private static void setLastInfo(BlockState state, BlockPos pos, Vec3d hitVecIn) {
+        lastBlockState = state;
+        lastBlockPos = pos;
+        lastHitVecIn = hitVecIn;
+    }
+
+    static {
+        TickHandler.ITickTask adjustTask = (mc -> {
+            if (!config.easyPlaceFix
+                    || adjustList.isEmpty()
+                    || System.currentTimeMillis() - lastAdjust < ADJUST_AWAIT_TIME
+                    || mc.getNetworkHandler() == null) {
+                return;
+            }
+            if (mc.interactionManager != null && mc.player != null) {
+                int count = 0;
+                for (AdjustInfo adjustInfo : adjustList) {
+                    int current = Math.min(adjustInfo.adjustTimes, MAX_ADJUST_PER_TICK - count);
+                    mc.player.input.sneaking = false;
+                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
+                            mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                    for (int i = 0; i < current; i++) {
+                        BlockHitResult blockHitResult = new BlockHitResult(
+                                adjustInfo.hitVecIn, Direction.NORTH, adjustInfo.blockPos, false);
+                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
+                    }
+                    adjustInfo.adjustTimes -= current;
+//                    ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
+                    count += current;
+                    if (count >= MAX_ADJUST_PER_TICK) {
+                        break;
+                    }
+                }
+            }
+            adjustList.removeIf(adjustInfo -> adjustInfo.adjustTimes == 0);
+            lastAdjust = System.currentTimeMillis();
+        });
+        TickHandler.getInstance().register(adjustTask);
+    }
+
+    public static class AdjustInfo {
+        public BlockState blockState;
+        public BlockPos blockPos;
+        public Vec3d hitVecIn;
+        public EnumFacing enumFacing;
+        public int adjustTimes;
+
+        public AdjustInfo(BlockState blockState, BlockPos blockPos, Vec3d hitVecIn, EnumFacing enumFacing, int adjustTimes) {
+            this.blockState = blockState;
+            this.blockPos = blockPos;
+            this.hitVecIn = hitVecIn;
+            this.enumFacing = enumFacing;
+            this.adjustTimes = adjustTimes;
         }
     }
 }

@@ -20,6 +20,9 @@ public class WorldUtils {
             //chests
             Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.ENDER_CHEST,
 
+            //barrel
+            Blocks.BARREL,
+
             //pistons
             Blocks.PISTON, Blocks.STICKY_PISTON,
 
@@ -45,16 +48,52 @@ public class WorldUtils {
             Blocks.OAK_DOOR, Blocks.SPRUCE_DOOR, Blocks.BIRCH_DOOR, Blocks.JUNGLE_DOOR, Blocks.ACACIA_DOOR, Blocks.CHERRY_DOOR, Blocks.DARK_OAK_DOOR, Blocks.MANGROVE_DOOR, Blocks.BAMBOO_DOOR, Blocks.CRIMSON_DOOR, Blocks.WARPED_DOOR, Blocks.COPPER_DOOR, Blocks.EXPOSED_COPPER_DOOR, Blocks.OXIDIZED_COPPER_DOOR, Blocks.WEATHERED_COPPER_DOOR, Blocks.WAXED_COPPER_DOOR, Blocks.WAXED_EXPOSED_COPPER_DOOR, Blocks.WAXED_OXIDIZED_COPPER_DOOR, Blocks.WAXED_WEATHERED_COPPER_DOOR,
 
             //all fence gates
-            Blocks.OAK_FENCE_GATE, Blocks.SPRUCE_FENCE_GATE, Blocks.BIRCH_FENCE_GATE, Blocks.JUNGLE_FENCE_GATE, Blocks.ACACIA_FENCE_GATE, Blocks.CHERRY_FENCE_GATE, Blocks.DARK_OAK_FENCE_GATE, Blocks.MANGROVE_FENCE_GATE, Blocks.BAMBOO_FENCE_GATE, Blocks.CRIMSON_FENCE_GATE, Blocks.WARPED_FENCE_GATE
+            Blocks.OAK_FENCE_GATE, Blocks.SPRUCE_FENCE_GATE, Blocks.BIRCH_FENCE_GATE, Blocks.JUNGLE_FENCE_GATE, Blocks.ACACIA_FENCE_GATE, Blocks.CHERRY_FENCE_GATE, Blocks.DARK_OAK_FENCE_GATE, Blocks.MANGROVE_FENCE_GATE, Blocks.BAMBOO_FENCE_GATE, Blocks.CRIMSON_FENCE_GATE, Blocks.WARPED_FENCE_GATE,
+
+            //note block
+            Blocks.NOTE_BLOCK
+    ));
+
+    public static final HashSet<Block> AXIS_BASED_BLOCKS = new HashSet<>(Set.of(
+            //all plain logs
+            Blocks.OAK_LOG, Blocks.SPRUCE_LOG, Blocks.BIRCH_LOG, Blocks.JUNGLE_LOG, Blocks.ACACIA_LOG, Blocks.CHERRY_LOG, Blocks.DARK_OAK_LOG, Blocks.MANGROVE_LOG, Blocks.MANGROVE_ROOTS,
+
+            //all stripped logs
+            Blocks.STRIPPED_SPRUCE_LOG, Blocks.STRIPPED_BIRCH_LOG, Blocks.STRIPPED_JUNGLE_LOG, Blocks.STRIPPED_ACACIA_LOG, Blocks.STRIPPED_CHERRY_LOG, Blocks.STRIPPED_DARK_OAK_LOG, Blocks.STRIPPED_OAK_LOG, Blocks.STRIPPED_MANGROVE_LOG, Blocks.STRIPPED_BAMBOO_BLOCK,
+
+            //all plain woods
+            Blocks.OAK_WOOD, Blocks.SPRUCE_WOOD, Blocks.BIRCH_WOOD, Blocks.JUNGLE_WOOD, Blocks.ACACIA_WOOD, Blocks.CHERRY_WOOD, Blocks.DARK_OAK_WOOD, Blocks.MANGROVE_WOOD,
+
+            //all stripped woods
+            Blocks.STRIPPED_OAK_WOOD, Blocks.STRIPPED_SPRUCE_WOOD, Blocks.STRIPPED_BIRCH_WOOD, Blocks.STRIPPED_JUNGLE_WOOD, Blocks.STRIPPED_ACACIA_WOOD, Blocks.STRIPPED_CHERRY_WOOD, Blocks.STRIPPED_DARK_OAK_WOOD, Blocks.STRIPPED_MANGROVE_WOOD,
+
+            //deepslate
+            Blocks.DEEPSLATE,
+
+            //chain
+            Blocks.CHAIN,
+
+            //crimson hyphae
+            Blocks.CRIMSON_HYPHAE,
+
+            //warped hyphae
+            Blocks.WARPED_HYPHAE
     ));
 
     @Nullable
     public static EnumFacing getEnumFacing(BlockState state) {
+        boolean axisBased = WorldUtils.AXIS_BASED_BLOCKS.contains(state.getBlock());
         for (Property<?> prop : state.getProperties()) {
-            if (prop instanceof DirectionProperty && "facing".equals(prop.getName())) {
+            if (axisBased && prop instanceof EnumProperty && "axis".equals(prop.getName())) {
+                return switch (state.get(prop).toString()) {
+                    case "z" -> EnumFacing.NORTH;
+                    case "x" -> EnumFacing.EAST;
+                    case "y" -> EnumFacing.DOWN;
+                    default -> null;
+                };
+            } else if (prop instanceof DirectionProperty && "facing".equals(prop.getName())) {
                 return EnumFacing.getByName(state.get(prop).toString());
-            }
-            if (prop instanceof EnumProperty && "orientation".equals(prop.getName())) {
+            } else if (prop instanceof EnumProperty && "orientation".equals(prop.getName())) {
                 return EnumFacing.getByName(state.get(prop).toString());
             }
         }
@@ -89,6 +128,17 @@ public class WorldUtils {
 
     public static Vec3i vec3dTo3i(Vec3d vec3d) {
         return new Vec3i((int) vec3d.x, (int) vec3d.y, (int) vec3d.z);
+    }
+
+
+    @Nullable
+    public static Property<?> getBlockPropertyByName(BlockState blockState, String name) {
+        for (Property<?> prop : blockState.getProperties()) {
+            if (name.equals(prop.getName())) {
+                return prop;
+            }
+        }
+        return null;
     }
 
     public enum EnumFacing {
