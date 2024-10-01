@@ -5,7 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.nanboom233.Handlers.KeyboardInputHandler;
+import top.nanboom233.MinamiAddons;
+import top.nanboom233.Utils.Handlers.Events.KeyInputEvent;
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
@@ -18,6 +19,6 @@ public class MixinKeyboard {
             )
     )
     private void onKeyboardInput(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
-        KeyboardInputHandler.onKeyInput(key, scanCode, modifiers, action != 0);
+        MinamiAddons.eventBus.post(new KeyInputEvent(windowPointer, key, scanCode, action != 0));
     }
 }

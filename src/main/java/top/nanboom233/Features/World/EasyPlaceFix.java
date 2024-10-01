@@ -13,7 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
-import top.nanboom233.Handlers.TickHandler;
+import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
+import top.nanboom233.Utils.Handlers.SubscribeEvent;
 import top.nanboom233.Utils.WorldUtils;
 import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
@@ -213,38 +214,36 @@ public class EasyPlaceFix {
         lastHitVecIn = hitVecIn;
     }
 
-    static {
-        TickHandler.ITickTask adjustTask = (mc -> {
-            if (!config.easyPlaceFix
-                    || adjustList.isEmpty()
-                    || System.currentTimeMillis() - lastAdjust < ADJUST_AWAIT_TIME
-                    || mc.getNetworkHandler() == null) {
-                return;
-            }
-            if (mc.interactionManager != null && mc.player != null) {
-                int count = 0;
-                for (AdjustInfo adjustInfo : adjustList) {
-                    int current = Math.min(adjustInfo.adjustTimes, MAX_ADJUST_PER_TICK - count);
-                    mc.player.input.sneaking = false;
-                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
-                            mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                    for (int i = 0; i < current; i++) {
-                        BlockHitResult blockHitResult = new BlockHitResult(
-                                adjustInfo.hitVecIn, Direction.NORTH, adjustInfo.blockPos, false);
-                        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
-                    }
-                    adjustInfo.adjustTimes -= current;
+    @SubscribeEvent
+    public static void adjustTaskTick(TickEndEvent event) {
+        if (!config.easyPlaceFix
+                || adjustList.isEmpty()
+                || System.currentTimeMillis() - lastAdjust < ADJUST_AWAIT_TIME
+                || mc.getNetworkHandler() == null) {
+            return;
+        }
+        if (mc.interactionManager != null && mc.player != null) {
+            int count = 0;
+            for (AdjustInfo adjustInfo : adjustList) {
+                int current = Math.min(adjustInfo.adjustTimes, MAX_ADJUST_PER_TICK - count);
+                mc.player.input.sneaking = false;
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
+                        mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+                for (int i = 0; i < current; i++) {
+                    BlockHitResult blockHitResult = new BlockHitResult(
+                            adjustInfo.hitVecIn, Direction.NORTH, adjustInfo.blockPos, false);
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
+                }
+                adjustInfo.adjustTimes -= current;
 //                    ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
-                    count += current;
-                    if (count >= MAX_ADJUST_PER_TICK) {
-                        break;
-                    }
+                count += current;
+                if (count >= MAX_ADJUST_PER_TICK) {
+                    break;
                 }
             }
-            adjustList.removeIf(adjustInfo -> adjustInfo.adjustTimes == 0);
-            lastAdjust = System.currentTimeMillis();
-        });
-        TickHandler.getInstance().register(adjustTask);
+        }
+        adjustList.removeIf(adjustInfo -> adjustInfo.adjustTimes == 0);
+        lastAdjust = System.currentTimeMillis();
     }
 
     public static class AdjustInfo {

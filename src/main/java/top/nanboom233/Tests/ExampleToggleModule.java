@@ -1,6 +1,7 @@
-package top.nanboom233.Module;
+package top.nanboom233.Tests;
 
 import top.nanboom233.Config.Keybind.MultiKeybind;
+import top.nanboom233.Utils.Module.ToggleModuleTemplate;
 
 import java.util.Set;
 

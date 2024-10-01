@@ -9,7 +9,8 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import top.nanboom233.Commands.KeybindCommand;
 import top.nanboom233.Commands.MinamiCommandManager;
 import top.nanboom233.Config.Keybind.MultiKeybind;
-import top.nanboom233.Handlers.TickHandler;
+import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
+import top.nanboom233.Utils.Handlers.SubscribeEvent;
 import top.nanboom233.Utils.Texts.ChatUtils;
 
 import java.io.File;
@@ -20,11 +21,12 @@ import java.util.Set;
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
 import static top.nanboom233.Config.Keybind.MultiKeybind.KeyActionType.PRESS;
 import static top.nanboom233.Config.Keybind.MultiKeybind.scopeType.INGAME;
+import static top.nanboom233.MinamiAddons.mc;
 
 public class Config extends Vigilant {
     public static final String CONFIG_PATH = "./config/MinamiAddons/";
     private static final Config INSTANCE = new Config();
-    public final MultiKeybind keybind = new MultiKeybind(Set.of(KEY_NONE), INGAME, PRESS, false);
+    public static final MultiKeybind keybind = new MultiKeybind(Set.of(KEY_NONE), INGAME, PRESS, false);
 
     public static Config getInstance() {
         return INSTANCE;
@@ -44,18 +46,18 @@ public class Config extends Vigilant {
                     KeybindCommand.minamiKeybindSettingsIndicater
             ));
 
-    public final TickHandler.ITickTask configOpenHandle = mc -> {
-        if (keybind.isTriggered()) {
+    @SubscribeEvent
+    public static void configGUIHandler(TickEndEvent event) {
+        if (keybind.triggered()) {
             if (mc.currentScreen == null) {
                 UScreen.displayScreen(Config.getInstance().gui());
             }
         }
-    };
+    }
 
     public Config() {
         super(new File(CONFIG_PATH + "Features.toml"), "MinamiAddons");
         initialize();
-        TickHandler.getInstance().register(configOpenHandle);
     }
 
     @Property(

@@ -1,4 +1,4 @@
-package top.nanboom233.Packets;
+package top.nanboom233.Utils.Packets;
 
 import net.minecraft.network.packet.Packet;
 

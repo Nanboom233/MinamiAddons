@@ -6,7 +6,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import top.nanboom233.Config.Keybind.MultiKeybind;
-import top.nanboom233.Module.ModuleTemplate;
+import top.nanboom233.Utils.Module.ModuleTemplate;
 
 import java.util.Set;
 

@@ -9,17 +9,20 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import top.nanboom233.Config.Config;
 import top.nanboom233.Config.Keybind.KeyCodes;
+import top.nanboom233.Config.Keybind.KeybindConfig;
 import top.nanboom233.Config.Keybind.MultiKeybind;
-import top.nanboom233.Config.KeybindConfig;
-import top.nanboom233.Handlers.TickHandler;
+import top.nanboom233.MinamiAddons;
 import top.nanboom233.Mixins.MixinMinecraftClientAccessor;
-import top.nanboom233.Module.ModuleManager;
-import top.nanboom233.Module.ModuleTemplate;
+import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
+import top.nanboom233.Utils.KeyboardUtils;
+import top.nanboom233.Utils.Module.ModuleManager;
+import top.nanboom233.Utils.Module.ModuleTemplate;
 import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.Texts.MinamiTextComponent;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.mojang.brigadier.arguments.LongArgumentType.getLong;
@@ -29,8 +32,8 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 import static net.minecraft.command.CommandSource.suggestMatching;
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_ESCAPE;
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
-import static top.nanboom233.Config.KeybindConfig.commandSetKeybind;
-import static top.nanboom233.Config.KeybindConfig.parseToLong;
+import static top.nanboom233.Config.Keybind.KeybindConfig.commandSetKeybind;
+import static top.nanboom233.Config.Keybind.KeybindConfig.parseToLong;
 import static top.nanboom233.MinamiAddons.config;
 import static top.nanboom233.MinamiAddons.mc;
 import static top.nanboom233.Utils.Texts.MinamiStyles.*;
@@ -53,7 +56,7 @@ public class KeybindCommand {
             727727, null,
             description, "MinamiAddons");
     private static Set<String> keybindableFeatures = null;
-    public static TickHandler.ITickTask setKeybindProgress;
+    public static Consumer<TickEndEvent> setKeybindProgress;
     public static Set<Integer> aleardyPressedKeyCodes;
     public static boolean hasInput;
     public static boolean firstShown;
@@ -66,7 +69,7 @@ public class KeybindCommand {
         show(new MinamiTextComponent("Minami Keybinds Settings:").withStyles(GRAY));
 
         //config keybind
-        MinamiTextComponent configKeybindInfo = getKeybindInfoText("Config", Config.getInstance().keybind);
+        MinamiTextComponent configKeybindInfo = getKeybindInfoText("Config", Config.keybind);
         show(configKeybindInfo);
 
         //modules keybinds
@@ -127,11 +130,11 @@ public class KeybindCommand {
         aleardyPressedKeyCodes = new HashSet<>();
         hasInput = false;
         firstShown = false;
-        setKeybindProgress = mc -> {
+        setKeybindProgress = (TickEndEvent event) -> {
             if (System.currentTimeMillis() - settingStartTime < 200) {
                 return;
             }
-            Set<Integer> pressedKeyCodes = new HashSet<>(MultiKeybind.getPressedKeys());
+            Set<Integer> pressedKeyCodes = new HashSet<>(KeyboardUtils.getPressedKeys());
             Set<String> pressedKeys =
                     pressedKeyCodes.stream()
                             .map(KeyCodes::getNameForKey)
@@ -171,16 +174,16 @@ public class KeybindCommand {
                                 .runCommand("/minami keybind " + keybindableFeature)));
                 emptyLine();
                 show(new MinamiTextComponent("-----------------------------------").withStyles(GRAY));
-                TickHandler.getInstance().unregister(setKeybindProgress);
+                MinamiAddons.eventBus.unregister(TickEndEvent.class, setKeybindProgress);
             }
             if (System.currentTimeMillis() - settingStartTime > config.settingsTimeout * 1000L) {
                 MinamiCommandManager.beforeRender();
-                show(new MinamiTextComponent("Keybind Setting Aborted."));
-                TickHandler.getInstance().unregister(setKeybindProgress);
+                ChatUtils.show(new MinamiTextComponent("Keybind Setting Aborted."));
+                MinamiAddons.eventBus.unregister(TickEndEvent.class, setKeybindProgress);
             }
         };
         settingStartTime = System.currentTimeMillis();
-        TickHandler.getInstance().register(setKeybindProgress);
+        MinamiAddons.eventBus.register(TickEndEvent.class, setKeybindProgress);
         return 1;
     }
 

@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import top.nanboom233.Config.Keybind.MultiKeybind;
-import top.nanboom233.Handlers.TickHandler;
+import top.nanboom233.MinamiAddons;
+import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 
 
 @Mixin(MinecraftClient.class)
@@ -23,7 +23,6 @@ public class MixinMinecraftClient {
             at = @At("RETURN")
     )
     private void onTick(CallbackInfo ci) {
-        MultiKeybind.onKeyRelease();
-        TickHandler.getInstance().onClientEndTick((MinecraftClient) (Object) this);
+        MinamiAddons.eventBus.post(new TickEndEvent());
     }
 }

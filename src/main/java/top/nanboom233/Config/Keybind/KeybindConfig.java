@@ -1,10 +1,10 @@
-package top.nanboom233.Config;
+package top.nanboom233.Config.Keybind;
 
 import top.nanboom233.Commands.MinamiCommandManager;
-import top.nanboom233.Config.Keybind.KeyCodes;
+import top.nanboom233.Config.Config;
 import top.nanboom233.MinamiAddons;
-import top.nanboom233.Module.ModuleManager;
-import top.nanboom233.Module.ModuleTemplate;
+import top.nanboom233.Utils.Module.ModuleManager;
+import top.nanboom233.Utils.Module.ModuleTemplate;
 import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.Texts.MinamiStyles;
 import top.nanboom233.Utils.Texts.MinamiTextComponent;
@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
-import static top.nanboom233.MinamiAddons.config;
 import static top.nanboom233.Utils.Texts.MinamiStyles.*;
 
 public class KeybindConfig {
@@ -43,7 +42,7 @@ public class KeybindConfig {
             for (String key : keys) {
                 long value = Long.parseLong(prop.getProperty(key));
                 if (!setKeybind(key, parseToSet(value))) {
-                    MinamiAddons.getLogger().fatal("Failed to set keybind for " + key + " as " + parseToSet(value));
+                    MinamiAddons.logger.fatal("Failed to set keybind for " + key + " as " + parseToSet(value));
                 }
             }
 
@@ -117,7 +116,7 @@ public class KeybindConfig {
             showSuccessMessage(featureName, keyBindStrings);
             return 1;
         }
-        MinamiAddons.getLogger().fatal("Failed to set keybind for " + featureName + " as " + keyBindStrings);
+        MinamiAddons.logger.fatal("Failed to set keybind for " + featureName + " as " + keyBindStrings);
         ChatUtils.debug("failed setting keybinds.", ChatUtils.MessageCategory.ERROR);
         return 0;
     }
@@ -131,12 +130,12 @@ public class KeybindConfig {
         }
 
         if ("Config".equals(featureName)) {
-            config.keybind.setKeybind(keyCodes);
+            Config.keybind.set(keyCodes);
             return true;
         } else {
             for (ModuleTemplate module : ModuleManager.getInstance().getModuleList()) {
                 if (featureName.equals(module.moduleName)) {
-                    module.keybind.setKeybind(keyCodes);
+                    module.keybind.set(keyCodes);
                     return true;
                 }
             }

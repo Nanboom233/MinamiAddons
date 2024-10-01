@@ -1,6 +1,5 @@
 package top.nanboom233.Utils.Texts;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -9,11 +8,11 @@ import top.nanboom233.Mixins.MixinChatHudAccessor;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static top.nanboom233.MinamiAddons.mc;
 import static top.nanboom233.Utils.Texts.MinamiStyles.*;
 
 
 public class ChatUtils {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final Text description = new MinamiTextComponent("Messages shown by ").withStyles(GRAY)
             .append(new MinamiTextComponent("MinamiAddons").withStyles(BOLD, GOLD))
             .append(new MinamiTextComponent(".")).getText();

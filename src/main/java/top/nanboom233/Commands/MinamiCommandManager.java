@@ -6,9 +6,12 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
-import top.nanboom233.Handlers.TickHandler;
+import top.nanboom233.MinamiAddons;
+import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.Texts.MinamiTextComponent;
+
+import java.util.function.Consumer;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static top.nanboom233.MinamiAddons.config;
@@ -35,13 +38,13 @@ public class MinamiCommandManager {
         literalargumentbuilder = KeybindCommand.register(literalargumentbuilder, commandRegistryAccess);
         dispatcher.register(literalargumentbuilder);
 
-        TickHandler.ITickTask autoClear = mc -> {
+        Consumer<TickEndEvent> autoClear = (TickEndEvent event) -> {
             if (lastResponse != -1 && System.currentTimeMillis() - lastResponse > config.settingsTimeout * 1000L) {
                 lastResponse = -1;
                 clearSettingMessage();
             }
         };
-        TickHandler.getInstance().register(autoClear);
+        MinamiAddons.eventBus.register(TickEndEvent.class, autoClear);
     }
 
     public static void show(MinamiTextComponent text) {

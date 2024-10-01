@@ -1,11 +1,7 @@
 package top.nanboom233.Config.Keybind;
 
-import top.nanboom233.Config.IEnumOption;
-import top.nanboom233.Handlers.TickHandler;
-import top.nanboom233.Handlers.TickHandler.ITickTask;
 import top.nanboom233.MinamiAddons;
 import top.nanboom233.Utils.KeyboardUtils;
-import top.nanboom233.Utils.Texts.ChatUtils;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,10 +9,9 @@ import java.util.Set;
 
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
 import static top.nanboom233.Config.Keybind.MultiKeybind.scopeType.INGAME;
-import static top.nanboom233.MinamiAddons.config;
+import static top.nanboom233.Utils.KeyboardUtils.getPressedKeys;
 
-public class MultiKeybind implements IKeybindCategory {
-    private static final HashSet<Integer> pressedKeys = new HashSet<>();
+public class MultiKeybind {
     public final scopeType scope;
     public KeyActionType action;
     public final boolean allowExtraKeys;
@@ -25,22 +20,15 @@ public class MultiKeybind implements IKeybindCategory {
     private boolean lastPressed = false;
     private long holdTicks = 0;
 
-    public final ITickTask updatePressed = (mc -> {
-        updateIsPressed();
-        tick();
-    });
-
-    public MultiKeybind(Set<Integer> keyCodes, scopeType type,
-                        KeyActionType action, boolean allowExtraKeys) {
+    public MultiKeybind(Set<Integer> keyCodes, scopeType type, KeyActionType action, boolean allowExtraKeys) {
         this.keyCodes = new HashSet<>(keyCodes);
         this.scope = type;
         this.action = action;
         this.allowExtraKeys = allowExtraKeys;
-        TickHandler.getInstance().register(updatePressed);
+        KeyboardUtils.registerKeybind(this);
     }
 
-    @Override
-    public boolean isTriggered() {
+    public boolean triggered() {
         boolean onPress = pressed && holdTicks == 1;
         boolean onRelease = !pressed && lastPressed;
         return switch (action) {
@@ -50,8 +38,21 @@ public class MultiKeybind implements IKeybindCategory {
         };
     }
 
-    @Override
-    public void tick() {
+    public void updateState() {
+        if (keyCodes.isEmpty() ||
+                (this.scope == INGAME) != (MinamiAddons.getCurrentScreen() == null)) {
+            pressed = false;
+        } else {
+            final int sizePressed = getPressedKeys().size();
+            final int sizeRequired = this.keyCodes.size();
+
+            if (sizePressed == sizeRequired || (allowExtraKeys && sizePressed > sizeRequired)) {
+                pressed = getPressedKeys().containsAll(this.keyCodes);
+            } else {
+                pressed = false;
+            }
+        }
+
         if (pressed) {
             holdTicks++;
         } else {
@@ -60,22 +61,18 @@ public class MultiKeybind implements IKeybindCategory {
         lastPressed = pressed;
     }
 
-    @Override
     public boolean isBeingHeld() {
         return pressed;
     }
 
-    @Override
     public HashSet<Integer> getKeyCodes() {
         return keyCodes;
     }
 
-    @Override
-    public void setKeybind(Set<Integer> keyCodes) {
+    public void set(Set<Integer> keyCodes) {
         this.keyCodes = new HashSet<>(keyCodes);
     }
 
-    @Override
     public boolean matches(Set<Integer> keyCodes) {
         if (allowExtraKeys) {
             return keyCodes.containsAll(this.keyCodes);
@@ -83,84 +80,12 @@ public class MultiKeybind implements IKeybindCategory {
         return this.keyCodes.equals(keyCodes);
     }
 
-    @Override
     public boolean matches(int keyCode) {
         return this.keyCodes.equals(Set.of(keyCode));
     }
 
-    @Override
-    public void updateIsPressed() {
-        if (keyCodes.isEmpty() ||
-                (this.scope == INGAME) != (MinamiAddons.getCurrentScreen() == null)) {
-            pressed = false;
-            return;
-        }
-
-        final int sizePressed = pressedKeys.size();
-        final int sizeRequired = this.keyCodes.size();
-
-        if (sizePressed == sizeRequired || (allowExtraKeys && sizePressed > sizeRequired)) {
-            this.pressed = pressedKeys.containsAll(this.keyCodes);
-        } else {
-            pressed = false;
-        }
-    }
-
-    @Override
     public boolean isNone() {
         return this.matches(KEY_NONE);
-    }
-
-    public static void onKeyRelease() {
-        pressedKeys.removeIf(integer -> !KeyboardUtils.isKeyDown(integer));
-    }
-
-    public static void onKeyInput(int keyCode, int scanCode, boolean state) {
-        if (state) {
-            pressedKeys.add(keyCode);
-        } else {
-            pressedKeys.remove(keyCode);
-        }
-        if (config.printKeyboardDebugMessage) {
-            printDebugMessage(keyCode, scanCode, state);
-        }
-    }
-
-    private static void printDebugMessage(int keyCode, int scanCode, boolean keyState) {
-        String keyName = keyCode != KEY_NONE ? KeyCodes.getNameForKey(keyCode) : "<unknown>";
-        String type = keyState ? "PRESS" : "RELEASE";
-        String held = getActiveKeysString();
-        String msg = String.format("%s %s (%d), held keys: %s", type, keyName, keyCode, held);
-        ChatUtils.printActionbarMessage(msg);
-    }
-
-    public static Set<Integer> getPressedKeys() {
-        return pressedKeys;
-    }
-
-    public static String getActiveKeysString() {
-        if (!pressedKeys.isEmpty()) {
-            StringBuilder sb = new StringBuilder(128);
-            int i = 0;
-
-            for (int key : pressedKeys) {
-                if (i > 0) {
-                    sb.append(" + ");
-                }
-
-                String name = KeyboardUtils.getStorageStringForKeyCode(key);
-
-                if (name != null) {
-                    sb.append(String.format("%s (%d)", name, key));
-                }
-
-                i++;
-            }
-
-            return sb.toString();
-        }
-
-        return "<none>";
     }
 
     @Override
@@ -177,92 +102,22 @@ public class MultiKeybind implements IKeybindCategory {
         return stringBuilder.toString();
     }
 
-    public enum scopeType implements IEnumOption {
-        INGAME("ingame", "pumpkin.keybindstemplate.type.ingame"),
-        GUI("gui", "pumpkin.keybindstemplate.type.gui"),
-        ANY("any", "pumpkin.keybindstemplate.type.any");
-
-        private final String value;
-        private final String translationKey;
-
-        scopeType(String value, String translationKey) {
-            this.value = value;
-            this.translationKey = translationKey;
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MultiKeybind m)) {
+            return false;
         }
-
-        @Override
-        public String getStringValue() {
-            return value;
-        }
-
-        @Override
-        public String getTranslationKey() {
-            return translationKey;
-        }
-
-        @Override
-        public scopeType getFromValue(String value) {
-            for (scopeType t : scopeType.values()) {
-                if (t.value.equals(value)) {
-                    return t;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public scopeType getFromTranslationKey(String translationKey) {
-            for (scopeType t : scopeType.values()) {
-                if (t.translationKey.equals(translationKey)) {
-                    return t;
-                }
-            }
-            return null;
-        }
+        return m.scope == this.scope &&
+                m.action == this.action &&
+                m.keyCodes.equals(this.keyCodes) &&
+                m.allowExtraKeys == this.allowExtraKeys;
     }
 
-    public enum KeyActionType implements IEnumOption {
-        PRESS("press", "pumpkin.keybinds.keyaction.press"),
-        RELEASE("release", "pumpkin.keybinds.keyaction.release"),
-        ANY("any", "pumpkin.keybinds.keyaction.any");
+    public enum scopeType {
+        INGAME, GUI, ANY
+    }
 
-        KeyActionType(String value, String translationKey) {
-            this.value = value;
-            this.translationKey = translationKey;
-        }
-
-        private final String value;
-
-        private final String translationKey;
-
-        @Override
-        public String getStringValue() {
-            return value;
-        }
-
-        @Override
-        public String getTranslationKey() {
-            return translationKey;
-        }
-
-        @Override
-        public KeyActionType getFromValue(String value) {
-            for (KeyActionType t : KeyActionType.values()) {
-                if (t.value.equals(value)) {
-                    return t;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public KeyActionType getFromTranslationKey(String translationKey) {
-            for (KeyActionType t : KeyActionType.values()) {
-                if (t.translationKey.equals(translationKey)) {
-                    return t;
-                }
-            }
-            return null;
-        }
+    public enum KeyActionType {
+        PRESS, RELEASE, ANY
     }
 }

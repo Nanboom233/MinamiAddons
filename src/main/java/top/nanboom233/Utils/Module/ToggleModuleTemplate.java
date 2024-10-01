@@ -1,4 +1,4 @@
-package top.nanboom233.Module;
+package top.nanboom233.Utils.Module;
 
 import org.jetbrains.annotations.NotNull;
 import top.nanboom233.Config.Keybind.MultiKeybind;

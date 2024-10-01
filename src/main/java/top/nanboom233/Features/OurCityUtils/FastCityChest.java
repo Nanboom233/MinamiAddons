@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import top.nanboom233.Config.Keybind.MultiKeybind;
-import top.nanboom233.Module.ToggleModuleTemplate;
+import top.nanboom233.Utils.Module.ToggleModuleTemplate;
 import top.nanboom233.Utils.Texts.ChatUtils;
 
 import java.util.Set;

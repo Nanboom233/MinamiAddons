@@ -9,21 +9,24 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import top.nanboom233.Commands.MinamiCommandManager;
 import top.nanboom233.Config.Config;
-import top.nanboom233.Config.KeybindConfig;
-import top.nanboom233.Module.ModuleManager;
+import top.nanboom233.Config.Keybind.KeybindConfig;
+import top.nanboom233.Utils.Handlers.EventBus;
+import top.nanboom233.Utils.Module.ModuleManager;
 
 /**
  * @author Nanboom233
  */
 public class MinamiAddons implements ClientModInitializer {
     public static final String MOD_NAME = "MinamiAddons";
-    public static final String MOD_VERSION = "0.2.1-dev";
+    public static final String MOD_VERSION = "0.2.2-dev";
     public static final String MOD_ID = "minamiaddons";
-    private static final Logger logger = LogManager.getLogger(MOD_ID);
+
+    public static final Logger logger = LogManager.getLogger("MinamiAddons");
+    public static final EventBus eventBus = EventBus.getInstance();
+
     public static final ModuleManager moduleManager = ModuleManager.getInstance();
     public static final Config config = Config.getInstance();
     public static final KeybindConfig keybindConfig = KeybindConfig.getInstance();
-
 
     public static final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -39,10 +42,6 @@ public class MinamiAddons implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         registerCommands();
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
 }

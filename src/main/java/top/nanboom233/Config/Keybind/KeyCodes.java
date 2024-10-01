@@ -166,7 +166,7 @@ public class KeyCodes {
                     MAP_NAME_TO_KEY.put(name, keyCode);
                 }
             } catch (Exception e) {
-                MinamiAddons.getLogger().error("Failed to initialize the key name lookup!", e);
+                MinamiAddons.logger.error("Failed to initialize the key name lookup!", e);
             }
         }
     }

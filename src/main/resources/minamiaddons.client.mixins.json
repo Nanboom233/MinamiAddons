@@ -12,7 +12,7 @@
     "MixinChatHud",
     "MixinChatHudAccessor",
     "MixinClientCommonNetworkHandler",
-    "MixinCommandManager",
+    "MixinConnectScreen",
     "MixinKeyboard",
     "MixinLitematica",
     "MixinMinecraftClientAccessor",

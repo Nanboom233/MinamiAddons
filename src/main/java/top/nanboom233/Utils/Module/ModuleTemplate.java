@@ -1,4 +1,4 @@
-package top.nanboom233.Module;
+package top.nanboom233.Utils.Module;
 
 import org.jetbrains.annotations.NotNull;
 import top.nanboom233.Config.Keybind.MultiKeybind;
@@ -22,5 +22,19 @@ public abstract class ModuleTemplate {
 
     protected void trigger() {
         ChatUtils.debug(moduleName + " §6Triggered§r!", INFO);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ModuleTemplate module)) {
+            return false;
+        }
+        return module.moduleName.equals(this.moduleName) &&
+                module.description.equals(this.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return moduleName.hashCode() * 31 + description.hashCode();
     }
 }
