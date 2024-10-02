@@ -1,4 +1,4 @@
-package top.nanboom233.Features.Player;
+package top.nanboom233.Features.Miscellaneous;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.ChatHudLine;

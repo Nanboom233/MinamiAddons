@@ -50,7 +50,7 @@ public class KeybindCommand {
                                         .executes((context -> commandSetKeybind(getString(context, "keybindable features"), getLong(context, "keyCodes")))))));
     }
 
-    private static final Text description = new MinamiTextComponent("MinamiAddons").withStyles(BOLD, GOLD)
+    private static final Text description = new MinamiTextComponent("MinamiAddons").addStyles(BOLD, GOLD)
             .append(new MinamiTextComponent("'s Keybinds Settings Interface")).getText();
     public static final MessageIndicator minamiKeybindSettingsIndicater = new MessageIndicator(
             727727, null,
@@ -64,9 +64,9 @@ public class KeybindCommand {
 
     public static int listKeybinds() {
         MinamiCommandManager.beforeRender();
-        show(new MinamiTextComponent("___________________________________").withStyles(GRAY));
+        show(new MinamiTextComponent("___________________________________").addStyles(GRAY));
         emptyLine();
-        show(new MinamiTextComponent("Minami Keybinds Settings:").withStyles(GRAY));
+        show(new MinamiTextComponent("Minami Keybinds Settings:").addStyles(GRAY));
 
         //config keybind
         MinamiTextComponent configKeybindInfo = getKeybindInfoText("Config", Config.keybind);
@@ -79,7 +79,7 @@ public class KeybindCommand {
         }
 
         emptyLine();
-        show(new MinamiTextComponent("-----------------------------------").withStyles(GRAY));
+        show(new MinamiTextComponent("-----------------------------------").addStyles(GRAY));
         return 1;
     }
 
@@ -88,13 +88,13 @@ public class KeybindCommand {
                 new MinamiTextComponent(" - " + name + ": "));
         KeybindConfig.colorFeatureName(name, keybindInfo);
         if (keybind.isNone()) {
-            keybindInfo.append(new MinamiTextComponent("[NONE]").withStyles(YELLOW)
-                    .showText(new MinamiTextComponent("Click to set keybind for " + name + ".").withStyles(YELLOW))
+            keybindInfo.append(new MinamiTextComponent("[NONE]").addStyles(YELLOW)
+                    .showText(new MinamiTextComponent("Click to set keybind for " + name + ".").addStyles(YELLOW))
                     .runCommand("/minami keybind " + name)
             );
         } else {
             keybindInfo.append(new MinamiTextComponent(keybind.toString())
-                    .showText(new MinamiTextComponent("Click to change keybind for " + name + ".").withStyles(GRAY))
+                    .showText(new MinamiTextComponent("Click to change keybind for " + name + ".").addStyles(GRAY))
                     .runCommand("/minami keybind " + name)
             );
         }
@@ -159,21 +159,21 @@ public class KeybindCommand {
                         .append(new MinamiTextComponent(keybindableFeature));
                 KeybindConfig.colorFeatureName(keybindableFeature, confirmInfo);
                 confirmInfo.append(new MinamiTextComponent(" will be set to :"));
-                show(new MinamiTextComponent("___________________________________").withStyles(GRAY));
+                show(new MinamiTextComponent("___________________________________").addStyles(GRAY));
                 emptyLine();
                 show(confirmInfo);
                 emptyLine();
                 show(getCenterAlignText(KeybindConfig.getKeyInfo(alreadyPressedKeys, BOLD, DARK_GREEN)));
                 emptyLine();
-                show(new MinamiTextComponent("[CONFIRM]").withStyles(DARK_GREEN, BOLD)
-                        .showText(new MinamiTextComponent("Confirm and set the keybind.").withStyles(GRAY))
+                show(new MinamiTextComponent("[CONFIRM]").addStyles(DARK_GREEN, BOLD)
+                        .showText(new MinamiTextComponent("Confirm and set the keybind.").addStyles(GRAY))
                         .runCommand("/minami keybind " + keybindableFeature + " " + parseToLong(aleardyPressedKeyCodes))
                         .append(new MinamiTextComponent("    "))
-                        .append(new MinamiTextComponent("[RESET]").withStyles(RED, BOLD)
+                        .append(new MinamiTextComponent("[RESET]").addStyles(RED, BOLD)
                                 .showText(new MinamiTextComponent("Reset the keybind."))
                                 .runCommand("/minami keybind " + keybindableFeature)));
                 emptyLine();
-                show(new MinamiTextComponent("-----------------------------------").withStyles(GRAY));
+                show(new MinamiTextComponent("-----------------------------------").addStyles(GRAY));
                 MinamiAddons.eventBus.unregister(TickEndEvent.class, setKeybindProgress);
             }
             if (System.currentTimeMillis() - settingStartTime > config.settingsTimeout * 1000L) {
@@ -189,7 +189,7 @@ public class KeybindCommand {
 
     public static void updateKeybindRender(String keybindableFeature, Set<String> pressedKeys) {
         MinamiCommandManager.beforeRender();
-        show(new MinamiTextComponent("___________________________________").withStyles(GRAY));
+        show(new MinamiTextComponent("___________________________________").addStyles(GRAY));
         emptyLine();
         MinamiTextComponent setKeybindText = new MinamiTextComponent("Set Keybind for ")
                 .append(new MinamiTextComponent(keybindableFeature + ":"));
@@ -197,13 +197,13 @@ public class KeybindCommand {
         show(setKeybindText);
         emptyLine();
         if (pressedKeys.isEmpty()) {
-            show(getCenterAlignText(new MinamiTextComponent("[NONE]").withStyles(BOLD)));
+            show(getCenterAlignText(new MinamiTextComponent("[NONE]").addStyles(BOLD)));
         } else {
             show(getCenterAlignText(KeybindConfig.getKeyInfo(pressedKeys, BOLD, DARK_GREEN)));
         }
         emptyLine();
-        show(new MinamiTextComponent("ESC For KEY_NONE.").withStyles(BOLD, YELLOW));
-        show(new MinamiTextComponent("-----------------------------------").withStyles(GRAY));
+        show(new MinamiTextComponent("ESC For KEY_NONE.").addStyles(BOLD, YELLOW));
+        show(new MinamiTextComponent("-----------------------------------").addStyles(GRAY));
     }
 
     public static MinamiTextComponent getCenterAlignText(MinamiTextComponent originalText) {

@@ -20,7 +20,7 @@ import static top.nanboom233.Utils.Texts.MinamiStyles.GOLD;
 
 
 public class MinamiCommandManager {
-    private static final Text description = new MinamiTextComponent("MinamiAddons").withStyles(BOLD, GOLD)
+    private static final Text description = new MinamiTextComponent("MinamiAddons").addStyles(BOLD, GOLD)
             .append(new MinamiTextComponent("'s Main Settings Interface")).getText();
     public static final MessageIndicator minamiSettingsIndicater = new MessageIndicator(
             727727, null,
@@ -59,7 +59,7 @@ public class MinamiCommandManager {
 
     private static int defaultEntry() {
         beforeRender();
-        show(new MinamiTextComponent("Hello from MinamiAddons there! (*/ω＼*)").withStyles(GOLD));
+        show(new MinamiTextComponent("Hello from MinamiAddons there! (*/ω＼*)").addStyles(GOLD));
         return 1;
     }
 

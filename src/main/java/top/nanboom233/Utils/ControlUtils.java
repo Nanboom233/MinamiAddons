@@ -3,6 +3,7 @@ package top.nanboom233.Utils;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.MinamiAddons;
 
 import static top.nanboom233.MinamiAddons.mc;
 
@@ -36,5 +37,23 @@ public class ControlUtils {
 
     public static Pair<Float, Float> getFaceYawAndPitch(Vec3d vec) {
         return getFaceYawAndPitch((float) vec.getX(), (float) vec.getY(), (float) vec.getZ());
+    }
+
+    public static void setSlot(int slot) {
+        if (mc.player == null || mc.world == null) {
+            return;
+        }
+        if (slot < 0 || slot > 8) {
+            MinamiAddons.logger.error("Attempt to switch to a invaild slot: " + slot);
+            return;
+        }
+        mc.player.getInventory().selectedSlot = slot;
+    }
+
+    public static int getCurrentSlot() {
+        if (mc.player == null || mc.world == null) {
+            return -1;
+        }
+        return mc.player.getInventory().selectedSlot;
     }
 }

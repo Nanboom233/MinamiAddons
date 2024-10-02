@@ -8,6 +8,7 @@ import java.util.Set;
 import static top.nanboom233.Config.Keybind.KeyCodes.KEY_NONE;
 import static top.nanboom233.Config.Keybind.MultiKeybind.KeyActionType.PRESS;
 import static top.nanboom233.Config.Keybind.MultiKeybind.scopeType.INGAME;
+import static top.nanboom233.MinamiAddons.mc;
 
 public class ExampleInstantModule extends ModuleTemplate {
     public static final String moduleName = "ExampleInstantModule";
@@ -21,7 +22,10 @@ public class ExampleInstantModule extends ModuleTemplate {
     @Override
     protected void trigger() {
         super.trigger();
-//        ChatUtils.debug("Post a TestEvent!", ChatUtils.MessageCategory.WARNING);
-//        MinamiAddons.eventBus.post(new TestEvent("lolol233", 114514, false));
+//        ChatUtils.debug(String.valueOf(InventoryUtils.findItem(mc.player.playerScreenHandler, Items.NETHERITE_SWORD, UniformIntProvider.create(36, 44))), WARNING);
+//        mc.doAttack();
+        if (mc.crosshairTarget != null) {
+            System.err.println(mc.crosshairTarget.getType());
+        }
     }
 }

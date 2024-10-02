@@ -9,6 +9,7 @@ import top.nanboom233.Utils.Handlers.Events.KeyInputEvent;
 import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 import top.nanboom233.Utils.Handlers.SubscribeEvent;
 import top.nanboom233.Utils.Texts.ChatUtils;
+import top.nanboom233.Utils.Texts.MinamiTextComponent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -55,7 +56,7 @@ public class KeyboardUtils {
         String type = keyState ? "PRESS" : "RELEASE";
         String held = getActiveKeysString();
         String msg = String.format("%s %s (%d), held keys: %s", type, keyName, keyCode, held);
-        ChatUtils.printActionbarMessage(msg);
+        ChatUtils.actionbarShow(new MinamiTextComponent(msg), false);
     }
 
     public static void registerKeybind(MultiKeybind keybind) {

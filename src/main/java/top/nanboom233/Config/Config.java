@@ -111,5 +111,29 @@ public class Config extends Vigilant {
     )
     public int settingsTimeout = 30;
 
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "Enable damage overlay",
+            description = "Show the damage the player has dealt and taken.",
+            category = "Player"
+    )
+    public boolean enableDamageOverlay = false;
+
+    @Property(
+            type = PropertyType.TEXT,
+            name = "Attack Switch Item",
+            description = "The Item you are switching to when using AttackSwitch.",
+            category = "Player"
+    )
+    public String attackSwitchItem = "";
+
+    @Property(
+            type = PropertyType.CHECKBOX,
+            name = "SmartClicker Critical",
+            description = "Automatically jump to make SmartClicker to deal critical damage.",
+            category = "Player"
+    )
+    public boolean smartClickerCritical = false;
+
 }
 

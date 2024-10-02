@@ -4,6 +4,7 @@ import net.minecraft.text.*;
 
 import static net.minecraft.text.ClickEvent.Action.*;
 import static net.minecraft.text.HoverEvent.Action.SHOW_TEXT;
+import static top.nanboom233.Utils.Texts.MinamiStyles.EmptyStyle;
 
 public class MinamiTextComponent {
     public final MutableText content;
@@ -53,8 +54,22 @@ public class MinamiTextComponent {
         return this;
     }
 
-    public MinamiTextComponent withStyles(MinamiStyles... styles) {
+    public MinamiTextComponent addStyles(MinamiStyles... styles) {
         Style newStyle = content.getStyle();
+        for (MinamiStyles style : styles) {
+            newStyle = style.apply(newStyle);
+        }
+        content.setStyle(newStyle);
+        return this;
+    }
+
+    public MinamiTextComponent resetStyles() {
+        content.setStyle(EmptyStyle);
+        return this;
+    }
+
+    public MinamiTextComponent withStyles(MinamiStyles... styles) {
+        Style newStyle = EmptyStyle;
         for (MinamiStyles style : styles) {
             newStyle = style.apply(newStyle);
         }

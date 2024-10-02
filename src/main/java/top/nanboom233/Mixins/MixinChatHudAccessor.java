@@ -8,6 +8,10 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.List;
 
+/**
+ * @author Nanboom233
+ * @since 2024/10/3
+ */
 @Mixin(ChatHud.class)
 public interface MixinChatHudAccessor {
 
@@ -31,5 +35,4 @@ public interface MixinChatHudAccessor {
 
     @Accessor("messages")
     List<ChatHudLine> getMessages();
-
 }

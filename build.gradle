@@ -42,7 +42,7 @@ dependencies {
         exclude("group": "gg.essential", "module": "universalcraft-1.18.1-fabric")
     })
 
-    implementation 'org.reflections:reflections:0.10.2'
+    implementation(include("org.reflections:reflections:0.10.2"))
 }
 
 group = project.group + "." + project.mod_id

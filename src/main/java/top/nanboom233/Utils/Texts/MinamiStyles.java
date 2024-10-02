@@ -23,17 +23,23 @@ public enum MinamiStyles {
     LIGHT_PURPLE("§d", "light_purple", (style) -> style.withColor(Formatting.LIGHT_PURPLE)),
     YELLOW("§e", "yellow", (style) -> style.withColor(Formatting.YELLOW)),
     WHITE("§f", "white", (style) -> style.withColor(Formatting.WHITE)),
-    BOLD("§l", "bold", (style) -> style.withBold(true)),
+    BOLD("§r", "unbold", (style) -> style.withBold(true)),
     ITALIC("§o", "italic", (style) -> style.withItalic(true)),
     UNDERLINED("§n", "underlined", (style) -> style.withUnderline(true)),
     STRIKE_THROUGH("§m", "strike_through", (style) -> style.withStrikethrough(true)),
     OBFUSCATED("§k", "obfuscated", (style) -> style.withObfuscated(true)),
-    RESET("§r", "reset", (style) -> Style.EMPTY);
+    RESET("§r", "reset", (style) -> Style.EMPTY.withBold(false)
+            .withItalic(false).withUnderline(false)
+            .withStrikethrough(false).withObfuscated(false).withColor(Formatting.WHITE));
 
 
     public final String FORMATTING;
     public final String NAME;
     public final Function<Style, Style> APPLIER;
+
+    public static final Style EmptyStyle = Style.EMPTY.withBold(false)
+            .withItalic(false).withUnderline(false)
+            .withStrikethrough(false).withObfuscated(false).withColor(Formatting.WHITE);
 
     MinamiStyles(String formatting, String name, Function<Style, Style> applier) {
         this.FORMATTING = formatting;

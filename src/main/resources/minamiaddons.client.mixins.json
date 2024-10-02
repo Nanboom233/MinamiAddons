@@ -12,10 +12,13 @@
     "MixinChatHud",
     "MixinChatHudAccessor",
     "MixinClientCommonNetworkHandler",
+    "MixinClientPlayerInterationManager",
     "MixinConnectScreen",
     "MixinKeyboard",
     "MixinLitematica",
+    "MixinLivingEntity",
     "MixinMinecraftClientAccessor",
-    "MixinMouse"
+    "MixinMouse",
+    "MixinPlayerEntity"
   ]
 }

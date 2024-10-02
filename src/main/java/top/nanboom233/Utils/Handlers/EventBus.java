@@ -27,7 +27,6 @@ public class EventBus {
         Set<Method> methods = reflections.getMethodsAnnotatedWith(SubscribeEvent.class);
 
         for (Method method : methods) {
-            MinamiAddons.logger.warn("");
             MinamiAddons.logger.warn("[--] Found annotated method/handler:" + method.getName());
 
             //确保方法为静态方法

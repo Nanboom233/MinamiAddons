@@ -2,6 +2,8 @@ package top.nanboom233.Utils.Module;
 
 import org.jetbrains.annotations.NotNull;
 import top.nanboom233.Features.OurCityUtils.FastCityChest;
+import top.nanboom233.Features.Player.AttackSwitcher;
+import top.nanboom233.Features.Player.SmartClicker;
 import top.nanboom233.Features.World.GhostBlock;
 import top.nanboom233.Tests.ExampleInstantModule;
 import top.nanboom233.Tests.ExampleToggleModule;
@@ -39,6 +41,8 @@ public class ModuleManager {
         register(new ExampleInstantModule());
         register(new GhostBlock());
         register(new FastCityChest());
+        register(new AttackSwitcher());
+        register(new SmartClicker());
     }
 
     public void register(@NotNull ModuleTemplate module) {

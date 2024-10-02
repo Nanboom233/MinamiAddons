@@ -10,7 +10,7 @@ import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 
 
 @Mixin(MinecraftClient.class)
-public class MixinMinecraftClient {
+public abstract class MixinMinecraftClient {
     @Inject(
             method = "run",
             at = @At("HEAD")

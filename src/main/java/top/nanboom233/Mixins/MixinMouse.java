@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.nanboom233.Config.Keybind.KeyCodes;
-import top.nanboom233.Features.Player.ChatCopy;
+import top.nanboom233.Features.Miscellaneous.ChatCopy;
 import top.nanboom233.Utils.KeyboardUtils;
 
 import static top.nanboom233.MinamiAddons.config;

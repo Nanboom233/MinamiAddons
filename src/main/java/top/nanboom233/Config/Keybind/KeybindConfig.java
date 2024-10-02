@@ -86,9 +86,9 @@ public class KeybindConfig {
 
     public static void colorFeatureName(String featureName, MinamiTextComponent text) {
         if ("Config".equals(featureName)) {
-            text.lastComponent.withStyles(GOLD, BOLD);
+            text.lastComponent.addStyles(GOLD, BOLD);
         } else {
-            text.lastComponent.withStyles(AQUA, BOLD);
+            text.lastComponent.addStyles(AQUA, BOLD);
         }
     }
 
@@ -96,7 +96,7 @@ public class KeybindConfig {
         MinamiTextComponent keyInfo = new MinamiTextComponent("");
         Iterator<String> iterator = keys.iterator();
         while (iterator.hasNext()) {
-            keyInfo.append(new MinamiTextComponent(iterator.next()).withStyles(styles));
+            keyInfo.append(new MinamiTextComponent(iterator.next()).addStyles(styles));
             if (iterator.hasNext()) {
                 keyInfo.append(new MinamiTextComponent(" + "));
             }
@@ -173,11 +173,11 @@ public class KeybindConfig {
                 .append(new MinamiTextComponent(featureName));
         colorFeatureName(featureName, successMessage);
         successMessage.append(new MinamiTextComponent(" is set to :"));
-        ChatUtils.show(new MinamiTextComponent("___________________________________").withStyles(GRAY));
+        ChatUtils.show(new MinamiTextComponent("___________________________________").addStyles(GRAY));
         ChatUtils.emptyLine();
         ChatUtils.show(successMessage);
         ChatUtils.show(getKeyInfo(keyBindStrings, BOLD));
         ChatUtils.emptyLine();
-        ChatUtils.show(new MinamiTextComponent("-----------------------------------").withStyles(GRAY));
+        ChatUtils.show(new MinamiTextComponent("-----------------------------------").addStyles(GRAY));
     }
 }

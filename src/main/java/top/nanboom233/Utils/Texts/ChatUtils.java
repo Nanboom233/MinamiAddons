@@ -1,7 +1,6 @@
 package top.nanboom233.Utils.Texts;
 
 import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import top.nanboom233.Mixins.MixinChatHudAccessor;
 
@@ -13,8 +12,8 @@ import static top.nanboom233.Utils.Texts.MinamiStyles.*;
 
 
 public class ChatUtils {
-    private static final Text description = new MinamiTextComponent("Messages shown by ").withStyles(GRAY)
-            .append(new MinamiTextComponent("MinamiAddons").withStyles(BOLD, GOLD))
+    private static final Text description = new MinamiTextComponent("Messages shown by ").addStyles(GRAY)
+            .append(new MinamiTextComponent("MinamiAddons").addStyles(BOLD, GOLD))
             .append(new MinamiTextComponent(".")).getText();
     public static final MessageIndicator minamiMainIndicater = new MessageIndicator(
             233333, null,
@@ -132,10 +131,9 @@ public class ChatUtils {
         FATAL, ERROR, WARNING, DEBUG, INFO
     }
 
-    public static void printActionbarMessage(String key, Object... args) {
-        MutableText text = Text.translatable(key, args);
+    public static void actionbarShow(MinamiTextComponent text, boolean tinted) {
         if (mc.world != null) {
-            mc.inGameHud.setOverlayMessage(text, false);
+            mc.inGameHud.setOverlayMessage(text.getText(), tinted);
         }
     }
 

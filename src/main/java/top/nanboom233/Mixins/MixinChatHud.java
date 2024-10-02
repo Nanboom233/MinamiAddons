@@ -21,7 +21,7 @@ import java.util.List;
 import static top.nanboom233.MinamiAddons.config;
 
 @Mixin(ChatHud.class)
-public abstract class MixinChatHud {
+public class MixinChatHud {
     @Shadow
     @Final
     List<ChatHudLine.Visible> visibleMessages;
