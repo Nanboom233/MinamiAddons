@@ -2,10 +2,12 @@ package top.nanboom233.Commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import gg.essential.universal.UScreen;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
+import top.nanboom233.Config.Config;
 import top.nanboom233.MinamiAddons;
 import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 import top.nanboom233.Utils.Texts.ChatUtils;
@@ -60,6 +62,7 @@ public class MinamiCommandManager {
     private static int defaultEntry() {
         beforeRender();
         show(new MinamiTextComponent("Hello from MinamiAddons there! (*/ω＼*)").addStyles(GOLD));
+        UScreen.displayScreen(Config.getInstance().gui());
         return 1;
     }
 
