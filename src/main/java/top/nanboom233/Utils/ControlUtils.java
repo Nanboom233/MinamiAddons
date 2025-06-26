@@ -45,15 +45,15 @@ public class ControlUtils {
         }
         if (slot < 0 || slot > 8) {
             MinamiAddons.logger.error("Attempt to switch to a invaild slot: " + slot);
-            return;
         }
-        mc.player.getInventory().selectedSlot = slot;
+//        mc.player.getInventory().selectedSlot = slot;
     }
 
     public static int getCurrentSlot() {
         if (mc.player == null || mc.world == null) {
             return -1;
         }
-        return mc.player.getInventory().selectedSlot;
+//        return mc.player.getInventory().selectedSlot;
+        return -1;
     }
 }

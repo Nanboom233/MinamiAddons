@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,7 +30,7 @@ public class MixinPlayerEntity {
             ),
             locals = LocalCapture.CAPTURE_FAILSOFT
     )
-    private void trackDamageDealt(Entity target, CallbackInfo ci, float f, ItemStack itemStack, DamageSource damageSource, float g, float h, boolean bl, boolean bl2, boolean bl3, float i, boolean bl4, double d, float j, boolean bl5, float k, Entity entity, boolean bl6, float n) {
+    private void trackDamageDealt(Entity target, CallbackInfo ci, float f, ItemStack itemStack, DamageSource damageSource, float g, float h, boolean bl, boolean bl2, boolean bl3, float i, boolean bl4, float j, boolean bl5, float k, Entity entity, boolean bl6, float n) {
         if (!MinamiAddons.config.enableDamageOverlay) {
             return;
         }
@@ -43,7 +44,7 @@ public class MixinPlayerEntity {
             method = "damage",
             at = @At("RETURN")
     )
-    private void trackDamageTaken(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    private void trackDamageTaken(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (!MinamiAddons.config.enableDamageOverlay) {
             return;
         }

@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '2.0.0'
-    id 'fabric-loom' version '1.7.2'
+    id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -36,11 +36,9 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
     modCompileOnly "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
 
-    modImplementation(include("gg.essential:universalcraft-1.21-fabric:344"))
-    modImplementation(include("gg.essential:elementa-1.18.1-fabric:652"))
-    modImplementation(include("gg.essential:vigilance-1.18.1-fabric:299") {
-        exclude("group": "gg.essential", "module": "universalcraft-1.18.1-fabric")
-    })
+    modImplementation(include("gg.essential:universalcraft-1.21.6-fabric:415"))
+    modImplementation(include("gg.essential:elementa:710"))
+    modImplementation(include("gg.essential:vigilance:306"))
 
     implementation(include("org.reflections:reflections:0.10.2"))
 }

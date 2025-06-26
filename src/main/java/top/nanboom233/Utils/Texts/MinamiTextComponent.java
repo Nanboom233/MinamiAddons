@@ -2,8 +2,8 @@ package top.nanboom233.Utils.Texts;
 
 import net.minecraft.text.*;
 
-import static net.minecraft.text.ClickEvent.Action.*;
-import static net.minecraft.text.HoverEvent.Action.SHOW_TEXT;
+import java.net.URI;
+
 import static top.nanboom233.Utils.Texts.MinamiStyles.EmptyStyle;
 
 public class MinamiTextComponent {
@@ -30,27 +30,32 @@ public class MinamiTextComponent {
     }
 
     public MinamiTextComponent suggestCommand(String command) {
-        content.setStyle(content.getStyle().withClickEvent(new ClickEvent(SUGGEST_COMMAND, command)));
+        content.setStyle(content.getStyle().withClickEvent(new ClickEvent.SuggestCommand(command)));
         return this;
     }
 
     public MinamiTextComponent runCommand(String command) {
-        content.setStyle(content.getStyle().withClickEvent(new ClickEvent(RUN_COMMAND, command)));
+        content.setStyle(content.getStyle().withClickEvent(new ClickEvent.RunCommand(command)));
         return this;
     }
 
     public MinamiTextComponent showText(MinamiTextComponent text) {
-        content.setStyle(content.getStyle().withHoverEvent(new HoverEvent(SHOW_TEXT, text.content)));
+        content.setStyle(content.getStyle().withHoverEvent(new HoverEvent.ShowText(text.content)));
         return this;
     }
 
     public MinamiTextComponent openUrl(String url) {
-        content.setStyle(content.getStyle().withClickEvent(new ClickEvent(OPEN_URL, url)));
+        try {
+            content.setStyle(content.getStyle().withClickEvent(new ClickEvent.OpenUrl(new URI(url))));
+        } catch (java.net.URISyntaxException e) {
+            e.printStackTrace();
+            return this;
+        }
         return this;
     }
 
     public MinamiTextComponent openFile(String fileAbsolutePath) {
-        content.setStyle(content.getStyle().withClickEvent(new ClickEvent(OPEN_FILE, fileAbsolutePath)));
+        content.setStyle(content.getStyle().withClickEvent(new ClickEvent.OpenFile(fileAbsolutePath)));
         return this;
     }
 

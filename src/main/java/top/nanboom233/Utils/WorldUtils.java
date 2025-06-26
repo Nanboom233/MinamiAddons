@@ -3,7 +3,7 @@ package top.nanboom233.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
@@ -91,7 +91,7 @@ public class WorldUtils {
                     case "y" -> EnumFacing.DOWN;
                     default -> null;
                 };
-            } else if (prop instanceof DirectionProperty && "facing".equals(prop.getName())) {
+            } else if (prop instanceof BooleanProperty && "facing".equals(prop.getName())) {
                 return EnumFacing.getByName(state.get(prop).toString());
             } else if (prop instanceof EnumProperty && "orientation".equals(prop.getName())) {
                 return EnumFacing.getByName(state.get(prop).toString());
