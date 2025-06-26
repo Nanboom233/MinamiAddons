@@ -35,6 +35,7 @@ dependencies {
 
     modCompileOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
     modCompileOnly "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
+    modCompileOnly "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
 
     modImplementation(include("gg.essential:universalcraft-1.21.6-fabric:415"))
     modImplementation(include("gg.essential:elementa:710"))

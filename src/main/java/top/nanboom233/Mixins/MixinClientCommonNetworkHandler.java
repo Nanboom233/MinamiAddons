@@ -13,10 +13,11 @@ public class MixinClientCommonNetworkHandler {
 
     @Inject(
             method = "sendPacket",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            cancellable = true
     )
     private void beforePacket(Packet<?> packet, CallbackInfo ci) {
-        PacketManager.onSendPacket(packet);
+        PacketManager.onSendPacket(packet, ci);
     }
 
     @Inject(

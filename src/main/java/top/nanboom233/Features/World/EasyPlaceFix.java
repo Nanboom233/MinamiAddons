@@ -6,13 +6,16 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
+import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import top.nanboom233.Utils.ControlUtils;
 import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 import top.nanboom233.Utils.Handlers.SubscribeEvent;
+import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
 import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
@@ -22,15 +25,17 @@ import static top.nanboom233.MinamiAddons.config;
 import static top.nanboom233.MinamiAddons.mc;
 
 public class EasyPlaceFix {
-    private static boolean povRecovery = false;
-    private static final boolean sneakRecovery = false;
+    public static boolean povRecovery = false;
+    private static float originalYaw = 0.0f;
+    private static float originalPitch = 0.0f;
+    private static boolean sneakRecovery = false;
     private static BlockState lastBlockState = null;
     private static BlockPos lastBlockPos = null;
     private static Vec3d lastHitVecIn = null;
     private static EnumFacing lastEnumFacing = null;
     private static final ArrayList<AdjustInfo> adjustList = new ArrayList<>();
-    private static final int MAX_ADJUST_PER_TICK = 2;
-    private static final long lastAdjust = -1;
+    private static final int MAX_ADJUST_PER_TICK = 1;
+    private static long lastAdjustTime = -1;
     private static final long ADJUST_AWAIT_TIME = 55L;
 
     public static void applyMovementPacket(BlockPos pos, BlockState state, Vec3d hitVecIn) {
@@ -42,10 +47,12 @@ public class EasyPlaceFix {
         }
 //        ChatUtils.debug("enumFacing:" + enumFacing.name, ChatUtils.MessageCategory.DEBUG);
 //        ChatUtils.debug("before yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
-//        ChatUtils.debug("after yaw: " + getPlacingYaw(block, enumFacing.yaw) + " ,after pitch: " + getPlacingPitch(block, enumFacing.pitch), ChatUtils.MessageCategory.DEBUG);
         if (WorldUtils.OPPOSITE_PLACING_BLOCKS.contains(block.getDefaultState().getBlock())) {
             enumFacing = enumFacing.getOpposite();
         }
+//        ChatUtils.debug("after yaw: " + enumFacing.yaw + " ,before pitch: " + enumFacing.pitch, ChatUtils.MessageCategory.DEBUG);
+        originalYaw = mc.player.getYaw();
+        originalPitch = mc.player.getPitch();
         mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
                 enumFacing.yaw, enumFacing.pitch, mc.player.isOnGround(), false));
         povRecovery = true;
@@ -62,42 +69,43 @@ public class EasyPlaceFix {
             Block block = lastBlockState.getBlock();
 
 //          sneak when placing chest
-//            if (block instanceof ChestBlock) {
-//                mc.player.input.playerInput.sneak();
+            if (block instanceof ChestBlock) {
+                ControlUtils.setSneaking(true);
 //                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
 //                        mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
-//                sneakRecovery = true;
-//
-//                for (Property<?> prop : lastBlockState.getProperties()) {
-//                    Comparable<?> val = lastBlockState.get(prop);
-//                    if (prop instanceof EnumProperty && "type".equals(prop.getName())) {
-//                        String chestType = val.toString();
-//                        switch (chestType) {
-//                            case "LEFT":
-//                                BlockPos leftBlockPos = WorldUtils.getLeftBlockPos(blockPos, lastEnumFacing);
-//                                if (mc.world != null
-//                                        && mc.world.getBlockState(leftBlockPos).getBlock() == Blocks.CHEST) {
-////                                    System.err.println("left");
-//                                    return new BlockHitResult(WorldUtils.getBlockCorner(leftBlockPos),
-//                                            lastEnumFacing.getRight().direction, leftBlockPos, insideBlock);
-//                                }
-//                                break;
-//                            case "RIGHT":
-//                                BlockPos rightBlockPos = WorldUtils.getRightBlockPos(blockPos, lastEnumFacing);
-//                                if (mc.world != null
-//                                        && mc.world.getBlockState(rightBlockPos).getBlock() == Blocks.CHEST) {
-////                                    System.err.println("right");
-//                                    return new BlockHitResult(WorldUtils.getBlockCorner(rightBlockPos),
-//                                            lastEnumFacing.getLeft().direction, rightBlockPos, insideBlock);
-//                                }
-//                                break;
-//                        }
-////                        System.err.println("single");
-//                        return new BlockHitResult(WorldUtils.getUnderSurface(blockPos),
-//                                Direction.UP, blockPos, insideBlock);
-//                    }
-//                }
-//            }
+
+                sneakRecovery = true;
+
+                for (Property<?> prop : lastBlockState.getProperties()) {
+                    Comparable<?> val = lastBlockState.get(prop);
+                    if (prop instanceof EnumProperty && "type".equals(prop.getName())) {
+                        String chestType = val.toString();
+                        switch (chestType) {
+                            case "LEFT":
+                                BlockPos leftBlockPos = WorldUtils.getLeftBlockPos(blockPos, lastEnumFacing);
+                                if (mc.world != null
+                                        && mc.world.getBlockState(leftBlockPos).getBlock() == Blocks.CHEST) {
+//                                    System.err.println("left");
+                                    return new BlockHitResult(WorldUtils.getBlockCorner(leftBlockPos),
+                                            lastEnumFacing.getRight().direction, leftBlockPos, insideBlock);
+                                }
+                                break;
+                            case "RIGHT":
+                                BlockPos rightBlockPos = WorldUtils.getRightBlockPos(blockPos, lastEnumFacing);
+                                if (mc.world != null
+                                        && mc.world.getBlockState(rightBlockPos).getBlock() == Blocks.CHEST) {
+//                                    System.err.println("right");
+                                    return new BlockHitResult(WorldUtils.getBlockCorner(rightBlockPos),
+                                            lastEnumFacing.getLeft().direction, rightBlockPos, insideBlock);
+                                }
+                                break;
+                        }
+//                        System.err.println("single");
+                        return new BlockHitResult(WorldUtils.getUnderSurface(blockPos),
+                                Direction.UP, blockPos, insideBlock);
+                    }
+                }
+            }
 
             //fix door's hinge
             if (block instanceof DoorBlock) {
@@ -172,7 +180,7 @@ public class EasyPlaceFix {
                     }
                 } else if (block == Blocks.NOTE_BLOCK) {
                     Property<?> prop = WorldUtils.getBlockPropertyByName(lastBlockState, "note");
-                    System.out.println(prop);
+//                    System.out.println(prop);
                     if (prop instanceof IntProperty) {
                         Comparable<?> val = lastBlockState.get(prop);
                         adjustTimes = Integer.parseInt(val.toString());
@@ -184,17 +192,16 @@ public class EasyPlaceFix {
             }
         }
 
-//        if (povRecovery && mc.player != null && mc.getNetworkHandler() != null) {
-//            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
-//                    mc.player.getYaw(), mc.player.getPitch(), mc.player.isOnGround()));
-//            povRecovery = false;
-//        }
-//
-//        if (sneakRecovery && mc.player != null && mc.getNetworkHandler() != null) {
-//            mc.player.input.sneaking = false;
-//            mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
-//                    mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-//        }
+
+        if (sneakRecovery && mc.player != null && mc.getNetworkHandler() != null) {
+            ControlUtils.setSneaking(false);
+        }
+
+        if (povRecovery && mc.player != null && mc.getNetworkHandler() != null) {
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(
+                    originalYaw, originalPitch, mc.player.isOnGround(), false));
+            povRecovery = false;
+        }
 
         resetLastInfo();
     }
@@ -204,6 +211,8 @@ public class EasyPlaceFix {
         lastBlockPos = null;
         lastHitVecIn = null;
         lastEnumFacing = null;
+        originalYaw = 0.0f;
+        originalPitch = 0.0f;
     }
 
     private static void setLastInfo(BlockState state, BlockPos pos, Vec3d hitVecIn) {
@@ -216,31 +225,29 @@ public class EasyPlaceFix {
     public static void adjustTaskTick(TickEndEvent event) {
         if (!config.easyPlaceFix
                 || adjustList.isEmpty()
-                || System.currentTimeMillis() - lastAdjust < ADJUST_AWAIT_TIME
+                || System.currentTimeMillis() - lastAdjustTime < ADJUST_AWAIT_TIME
                 || mc.getNetworkHandler() == null) {
         }
-//        if (mc.interactionManager != null && mc.player != null) {
-//            int count = 0;
-//            for (AdjustInfo adjustInfo : adjustList) {
-//                int current = Math.min(adjustInfo.adjustTimes, MAX_ADJUST_PER_TICK - count);
-//                mc.player.input.sneaking = false;
-//                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(
-//                        mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-//                for (int i = 0; i < current; i++) {
-//                    BlockHitResult blockHitResult = new BlockHitResult(
-//                            adjustInfo.hitVecIn, Direction.NORTH, adjustInfo.blockPos, false);
-//                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
-//                }
-//                adjustInfo.adjustTimes -= current;
-////                    ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
-//                count += current;
-//                if (count >= MAX_ADJUST_PER_TICK) {
-//                    break;
-//                }
-//            }
-//        }
-//        adjustList.removeIf(adjustInfo -> adjustInfo.adjustTimes == 0);
-//        lastAdjust = System.currentTimeMillis();
+        if (mc.interactionManager != null && mc.player != null) {
+            int count = 0;
+            for (AdjustInfo adjustInfo : adjustList) {
+                int current = Math.min(adjustInfo.adjustTimes, MAX_ADJUST_PER_TICK - count);
+                ControlUtils.setSneaking(false);
+                for (int i = 0; i < current; i++) {
+                    BlockHitResult blockHitResult = new BlockHitResult(
+                            adjustInfo.hitVecIn, Direction.NORTH, adjustInfo.blockPos, false);
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
+                }
+                adjustInfo.adjustTimes -= current;
+                ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
+                count += current;
+                if (count >= MAX_ADJUST_PER_TICK) {
+                    break;
+                }
+            }
+        }
+        adjustList.removeIf(adjustInfo -> adjustInfo.adjustTimes == 0);
+        lastAdjustTime = System.currentTimeMillis();
     }
 
     public static class AdjustInfo {

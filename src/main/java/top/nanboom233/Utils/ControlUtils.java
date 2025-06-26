@@ -1,6 +1,8 @@
 package top.nanboom233.Utils;
 
+import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.util.Pair;
+import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import top.nanboom233.MinamiAddons;
@@ -43,17 +45,41 @@ public class ControlUtils {
         if (mc.player == null || mc.world == null) {
             return;
         }
-        if (slot < 0 || slot > 8) {
+
+        try {
+            mc.player.getInventory().setSelectedSlot(slot);
+        } catch (IllegalArgumentException e) {
             MinamiAddons.logger.error("Attempt to switch to a invaild slot: " + slot);
         }
-//        mc.player.getInventory().selectedSlot = slot;
     }
 
     public static int getCurrentSlot() {
         if (mc.player == null || mc.world == null) {
             return -1;
         }
-//        return mc.player.getInventory().selectedSlot;
-        return -1;
+
+        return mc.player.getInventory().getSelectedSlot();
+    }
+
+    public static void setSneaking(boolean sneak) {
+        if (mc.player == null || mc.world == null || mc.getNetworkHandler() == null) {
+            return;
+        }
+
+        if (mc.player.isSneaking() != sneak) {
+            PlayerInput originalInput = mc.player.input.playerInput;
+            mc.player.setSneaking(sneak);
+            mc.getNetworkHandler().sendPacket(new PlayerInputC2SPacket(
+                    new PlayerInput(
+                            originalInput.forward(),
+                            originalInput.backward(),
+                            originalInput.left(),
+                            originalInput.right(),
+                            originalInput.jump(),
+                            sneak,
+                            originalInput.sprint()
+                    )
+            ));
+        }
     }
 }
