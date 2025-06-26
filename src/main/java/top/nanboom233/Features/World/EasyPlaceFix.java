@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import top.nanboom233.Utils.ControlUtils;
 import top.nanboom233.Utils.Handlers.Events.TickEndEvent;
 import top.nanboom233.Utils.Handlers.SubscribeEvent;
-import top.nanboom233.Utils.Texts.ChatUtils;
 import top.nanboom233.Utils.WorldUtils;
 import top.nanboom233.Utils.WorldUtils.EnumFacing;
 
@@ -239,7 +238,7 @@ public class EasyPlaceFix {
                     mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, blockHitResult);
                 }
                 adjustInfo.adjustTimes -= current;
-                ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
+//                ChatUtils.debug("interact " + current + " Times,left: " + adjustInfo.adjustTimes, ChatUtils.MessageCategory.DEBUG);
                 count += current;
                 if (count >= MAX_ADJUST_PER_TICK) {
                     break;

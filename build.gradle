@@ -41,6 +41,7 @@ dependencies {
     modImplementation(include("gg.essential:elementa:710"))
     modImplementation(include("gg.essential:vigilance:306"))
 
+    implementation(include('org.javassist:javassist:3.30.2-GA'))
     implementation(include("org.reflections:reflections:0.10.2"))
 }
 

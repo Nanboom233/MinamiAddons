@@ -46,6 +46,7 @@ public class EventBus {
             }
 
             //注册该Handler
+            @SuppressWarnings("unchecked")
             Class<? extends EventTemplate> eventType = (Class<? extends EventTemplate>) parameterTypes[0];
             register(eventType, method);
 
