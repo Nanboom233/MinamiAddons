@@ -32,7 +32,10 @@ public class WorldUtils {
             Blocks.REPEATER, Blocks.COMPARATOR, Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER, Blocks.CRAFTER,
 
             //furnace
-            Blocks.FURNACE
+            Blocks.FURNACE,
+
+            //jack o' lantern
+            Blocks.JACK_O_LANTERN
 
     ));
 
