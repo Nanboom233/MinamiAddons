@@ -3,6 +3,7 @@ package top.nanboom233.Utils.Module;
 import org.jetbrains.annotations.NotNull;
 import top.nanboom233.Features.OurCityUtils.FastCityChest;
 import top.nanboom233.Features.Player.AttackSwitcher;
+import top.nanboom233.Features.Player.AutoFeeder;
 import top.nanboom233.Features.Player.SmartClicker;
 import top.nanboom233.Features.World.GhostBlock;
 import top.nanboom233.Tests.ExampleInstantModule;
@@ -43,6 +44,7 @@ public class ModuleManager {
         register(new FastCityChest());
         register(new AttackSwitcher());
         register(new SmartClicker());
+        register(new AutoFeeder());
     }
 
     public void register(@NotNull ModuleTemplate module) {

@@ -1,9 +1,13 @@
 package top.nanboom233.Utils;
 
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerInputC2SPacket;
 import net.minecraft.util.Pair;
 import net.minecraft.util.PlayerInput;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.nanboom233.MinamiAddons;
 
@@ -81,5 +85,21 @@ public class ControlUtils {
                     )
             ));
         }
+    }
+
+    public static int findHotbarItem(@NotNull Item item) {
+        if (mc.player == null || mc.world == null) {
+            return -1;
+        }
+        PlayerInventory inventory = mc.player.getInventory();
+
+        // 优先检测快捷栏
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = inventory.getStack(i);
+            if (stack.getItem() == item && stack.getCount() > 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
